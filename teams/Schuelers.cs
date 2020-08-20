@@ -381,6 +381,11 @@ ORDER BY ausgetreten DESC, klasse, schueler.name_1, schueler.name_2", connection
                         var schueler = new Schueler();
                         schueler.Id = theRow["AtlantisSchuelerId"] == null ? -99 : Convert.ToInt32(theRow["AtlantisSchuelerId"]);
 
+
+                        if (schueler.Id == 150896)
+                        {
+                            string a = "";
+                        }
                         schueler.Nachname = theRow["Nachname"] == null ? "" : theRow["Nachname"].ToString();
                         schueler.Vorname = theRow["Vorname"] == null ? "" : theRow["Vorname"].ToString();
                         schueler.Klasse = theRow["Klasse"] == null ? "" : theRow["Klasse"].ToString();

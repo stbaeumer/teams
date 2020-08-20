@@ -69,7 +69,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="GruppenAuslesen.ps1" />
     <None Include="Teams.ps1" />
+    <None Include="TeamsAuslesen.ps1" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

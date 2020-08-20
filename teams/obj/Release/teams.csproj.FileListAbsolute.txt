@@ -1,0 +1,6 @@
+U:\Source\Repos\teams\teams\bin\Release\teams.exe.config
+U:\Source\Repos\teams\teams\bin\Release\teams.exe
+U:\Source\Repos\teams\teams\bin\Release\teams.pdb
+U:\Source\Repos\teams\teams\obj\Release\teams.csprojResolveAssemblyReference.cache
+U:\Source\Repos\teams\teams\obj\Release\teams.exe
+U:\Source\Repos\teams\teams\obj\Release\teams.pdb
