@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Odbc;
 using System.Data.OleDb;
+using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace teams
 {
@@ -399,12 +401,14 @@ ORDER BY ausgetreten DESC, klasse, schueler.name_1, schueler.name_2", connection
                         schueler.Austrittsdatum = theRow["Austrittsdatum"].ToString().Length < 3 ? new DateTime((DateTime.Now.Month >= 8 ? DateTime.Now.Year + 1 : DateTime.Now.Year), 7, 31) : DateTime.ParseExact(theRow["Austrittsdatum"].ToString(), "dd.MM.yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
                         schueler.Volljährig = schueler.Gebdat.AddYears(18) > DateTime.Now ? false : true;
                         schueler.Geschlecht = theRow["Geschlecht"] == null ? "" : theRow["Geschlecht"].ToString();
-
+                        schueler.Gebdat = theRow["Gebdat"].ToString().Length < 3 ? new DateTime() : DateTime.ParseExact(theRow["Gebdat"].ToString(), "dd.MM.yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
                         schueler.Relianmeldung = theRow["Relianmeldung"].ToString().Length < 3 ? new DateTime() : DateTime.ParseExact(theRow["Relianmeldung"].ToString(), "dd.MM.yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
                         schueler.Reliabmeldung = theRow["Reliabmeldung"].ToString().Length < 3 ? new DateTime() : DateTime.ParseExact(theRow["Reliabmeldung"].ToString(), "dd.MM.yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
 
                         schueler.Status = theRow["Status"] == null ? "" : theRow["Status"].ToString();
                         schueler.Bezugsjahr = Convert.ToInt32(theRow["Bezugsjahr"].ToString().Substring(0, 4)) - Convert.ToInt32(theRow["Fall_schuljahr_vorher"]);
+
+                        schueler.LSSchulnummer = theRow["LSSchulnummer"] == null ? "" : theRow["LSSchulnummer"].ToString();
 
                         if (schueler.Bezugsjahr == (DateTime.Now.Month >= 8 ? DateTime.Now.Year : DateTime.Now.Year - 1) && schueler.Status != "VB" && schueler.Status != "8" && schueler.Status != "9" && schueler.Klasse != "Z" && schueler.AktuellJN == "J")
                         {
@@ -417,7 +421,7 @@ ORDER BY ausgetreten DESC, klasse, schueler.name_1, schueler.name_2", connection
                         }
                     }
                 }
-
+                
                 using (OleDbConnection oleDbConnection = new OleDbConnection(Global.ConnectionStringUntis))
                 {
                     string sch = "";

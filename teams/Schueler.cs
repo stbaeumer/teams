@@ -42,6 +42,7 @@ namespace teams
         public string Anmeldename { get; internal set; }
         public string GeschlechtMw { get; internal set; }
         public int IdUntis { get; internal set; }
-        public string Klasse { get; internal set; }        
+        public string Klasse { get; internal set; }
+        public string LSSchulnummer { get; internal set; }
     }
 }

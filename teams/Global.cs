@@ -12,6 +12,7 @@ namespace teams
 
         public static List<string> TeamsPs1 { get; set; }
         public static string TeamsPs { get; set; }
+        public static string GruppenMemberPs { get; internal set; }
 
         public static string SafeGetString(OleDbDataReader reader, int colIndex)
         {
@@ -24,7 +25,8 @@ namespace teams
         {
             return @"
 
-if ( ([System.Io.fileinfo]'C:\users\bm\Documents\GruppenOwnerMembers.csv').LastWriteTime.Date -ge [datetime]::Today ){     
+# if ( ([System.Io.fileinfo]'C:\users\bm\Documents\GruppenOwnerMembers.csv').LastWriteTime.Date -ge [datetime]::Today ){     
+if ( true ){     
      'Die Datei C:\users\bm\Documents\GruppenOwnerMembers.csv muss nicht aktualisiert werden.'
 }else{
 

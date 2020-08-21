@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace teams
 {
@@ -18,7 +15,9 @@ namespace teams
                 List<string> aktSj = new List<string>();
 
                 DateTime datumMontagDerKalenderwoche = new DateTime(2020, 08, 10); //GetMondayDateOfWeek(kalenderwoche, DateTime.Now.Year);
-                Global.TeamsPs = @"C:\Users\bm\Documents\Teams.ps1";
+                Global.TeamsPs = @"\\fs01\Schulverwaltung\teams\Teams.ps1";
+                Global.GruppenMemberPs = @"\\fs01\Schulverwaltung\teams\GruppenOwnerMembers.csv";
+
                 Global.TeamsPs1 = new List<string>();
                 aktSj.Add((DateTime.Now.Month >= 8 ? DateTime.Now.Year : DateTime.Now.Year - 1).ToString());
                 aktSj.Add((DateTime.Now.Month >= 8 ? DateTime.Now.Year + 1 : DateTime.Now.Year).ToString());
@@ -31,6 +30,12 @@ namespace teams
                 Lehrers lehrers = new Lehrers(aktSj[0] + aktSj[1], connectionString, periodes);
                 Klasses klasses = new Klasses(aktSj[0] + aktSj[1], lehrers, connectionString, periode);
 
+                if (!File.Exists(Global.TeamsPs))
+                {
+                    File.Create(Global.TeamsPs);
+                    File.Create(Global.GruppenMemberPs);
+                }
+
                 try
                 {
                     File.WriteAllText(Global.TeamsPs, Global.Auth());
@@ -38,10 +43,10 @@ namespace teams
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception(" Die Datei Teams.ps1 ist von einem anderen Prozess gesperrt.\n\n" + ex);
+                    throw new Exception(" Die Datei Teams.ps1 ist von einem anderen Prozess gesperrt.\n\n" + ex);                    
                 }
 
-                Teams teamsIst = new Teams(@"C:\Users\bm\Documents\GruppenOwnerMembers.csv", klasses);
+                Teams teamsIst = new Teams(Global.GruppenMemberPs, klasses);
 
                 Schuelers schuelers = new Schuelers(klasses, aktSj[0] + aktSj[1]);
                 Fachs fachs = new Fachs(aktSj[0] + aktSj[1], connectionString);
@@ -60,19 +65,19 @@ namespace teams
                 
                 Global.TeamsPs1.Add("Write-Host 'Ende der Verarbeitung'");
                 File.AppendAllLines(Global.TeamsPs, Global.TeamsPs1);
-                
-                Console.WriteLine("Verarbeitung beendet");
-                Console.ReadKey();
 
+                Process.Start("powershell_ise.exe", Global.TeamsPs);
+
+                Console.WriteLine("Verarbeitung beendet");
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
+                Console.ReadKey();
             }
             finally
             {
-                Environment.Exit(0);
-                Console.ReadKey();
+                Environment.Exit(0);                
             }
         }
 

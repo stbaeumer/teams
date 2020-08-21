@@ -99,17 +99,6 @@ namespace teams
                     string a = "";
                 }
 
-                foreach (var item in ts.Owners)
-                {
-                    // Jeder Owner, der im Ist aber nicht im Soll existiert, wird gelöscht
-
-                    if (!(from o in klassenTeamsSoll where o.Owners.Contains(item) select o).Any())
-                    {
-                        Console.WriteLine("[-] Owner  entfernen:" + item.PadRight(30) + " aus " + ts.DisplayName);
-                        Global.TeamsPs1.Add(@"Write-Host '[-] Owner  entfernen:" + item.PadRight(30) + " aus " + ts.DisplayName + "'");
-                        Global.TeamsPs1.Add(@"Remove-UnifiedGroupLinks -Identity " + ts.DisplayName.PadRight(6) + " -LinkType Member -Links '" + item + "'");
-                    }
-                }
                 foreach (var item in ts.Members)
                 {
                     // Jeder Member, der im Ist aber nicht im Soll existiert, wird gelöscht 
@@ -118,9 +107,21 @@ namespace teams
                     {
                         Console.WriteLine("[-] Member entfernen:" + item.PadRight(30) + " aus " + ts.DisplayName);
                         Global.TeamsPs1.Add(@"Write-Host '[-] Member entfernen: " + item.PadRight(30) + " aus " + ts.DisplayName + "'");
-                        Global.TeamsPs1.Add(@"Remove-UnifiedGroupLinks -Identity " + ts.DisplayName.PadRight(6) + " -LinkType Owner  -Links '" + item + "'");
+                        Global.TeamsPs1.Add(@"Remove-UnifiedGroupLinks -Identity " + ts.DisplayName.PadRight(6) + " -LinkType Member  -Links '" + item + "'");
                     }
                 }
+
+                foreach (var item in ts.Owners)
+                {
+                    // Jeder Owner, der im Ist aber nicht im Soll existiert, wird gelöscht
+
+                    if (!(from o in klassenTeamsSoll where o.Owners.Contains(item) select o).Any())
+                    {
+                        Console.WriteLine("[-] Owner  entfernen:" + item.PadRight(30) + " aus " + ts.DisplayName);
+                        Global.TeamsPs1.Add(@"Write-Host '[-] Owner  entfernen:" + item.PadRight(30) + " aus " + ts.DisplayName + "'");
+                        Global.TeamsPs1.Add(@"Remove-UnifiedGroupLinks -Identity " + ts.DisplayName.PadRight(6) + " -LinkType Owner -Links '" + item + "'");
+                    }
+                }                
             }
         }
 
@@ -195,9 +196,6 @@ namespace teams
                 // Lehrer zur Office365-Gruppe hinzufügen
 
                 File.AppendAllText(Global.TeamsPs,@"Add-UnifiedGroupLinks -Identity 'Kollegium' -LinkType Members -Links '" + lehrer.Mail + "'");
-
-
-
             }
 
             this.Add(new Team("Kollegium", kollegium));
