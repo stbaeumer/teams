@@ -15,8 +15,8 @@ namespace teams
                 List<string> aktSj = new List<string>();
 
                 DateTime datumMontagDerKalenderwoche = new DateTime(2020, 08, 10); //GetMondayDateOfWeek(kalenderwoche, DateTime.Now.Year);
-                Global.TeamsPs = @"\\fs01\Schulverwaltung\teams\Teams.ps1";
-                Global.GruppenMemberPs = @"\\fs01\Schulverwaltung\teams\GruppenOwnerMembers.csv";
+                Global.TeamsPs = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal) + @"\\Teams.ps1";
+                Global.GruppenMemberPs = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal) + @"\\GruppenOwnerMembers.csv";
 
                 Global.TeamsPs1 = new List<string>();
                 aktSj.Add((DateTime.Now.Month >= 8 ? DateTime.Now.Year : DateTime.Now.Year - 1).ToString());
