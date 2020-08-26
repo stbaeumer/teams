@@ -25,8 +25,8 @@ namespace teams
         {
             return @"
 
-# if ( ([System.Io.fileinfo]'C:\users\bm\Documents\GruppenOwnerMembers.csv').LastWriteTime.Date -ge [datetime]::Today ){     
-if ( $FALSE ){     
+if ( ([System.Io.fileinfo]'C:\users\bm\Documents\GruppenOwnerMembers.csv').LastWriteTime.Date -ge [datetime]::Today ){     
+# if ( $FALSE ){     
      'Die Datei C:\users\bm\Documents\GruppenOwnerMembers.csv muss nicht aktualisiert werden.'
 }else{
 

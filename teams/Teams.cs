@@ -53,13 +53,9 @@ namespace teams
                 {
                     List<string> zeile = new List<string>();
                     zeile.AddRange(currentLine.Replace("\"", "").Replace("\\", "").Split(','));
-
+                    
                     // Prüfe, ob es ein Klassenteam ist
-                    if (zeile[1] == "EE18A")
-                    {
-                        string a = "";
-                    }
-
+                    
                     if ((from k in klasses where k.NameUntis == zeile[1] select k).Any())
                     {
                         var x = (from t in this where t.DisplayName == zeile[1] where t.TeamId == zeile[0] select t).FirstOrDefault();
@@ -89,9 +85,7 @@ namespace teams
                     }
                 }
             }
-            Console.WriteLine("Insgesamt " + this.Count + " Klassengruppen in Office365 vorhanden.");
-
-            var zz = (from x in this where x.DisplayName == "EE18A" select x).ToList();
+            Console.WriteLine("Insgesamt " + this.Count + " Klassengruppen in Office365 vorhanden.");            
         }
 
         internal void DoppelteKlassenFinden()
@@ -134,7 +128,7 @@ namespace teams
                         {
                             Console.WriteLine("[-] Member entfernen:" + item.PadRight(30) + " aus " + ts.DisplayName);
                             Global.TeamsPs1.Add(@"Write-Host '[-] Member entfernen: " + item.PadRight(30) + " aus " + ts.DisplayName + "'");
-                            Global.TeamsPs1.Add(@"Remove-UnifiedGroupLinks -Identity " + ts.TeamId + " -LinkType Member  -Links '" + item + "'");
+                            Global.TeamsPs1.Add(@"Remove-UnifiedGroupLinks -Identity " + ts.TeamId + " -LinkType Member  -Links '" + item + "' -Confirm");
                         }
                     }
                 }
@@ -147,7 +141,7 @@ namespace teams
                     {
                         Console.WriteLine("[-] Owner  entfernen:" + item.PadRight(30) + " aus " + ts.DisplayName);
                         Global.TeamsPs1.Add(@"Write-Host '[-] Owner  entfernen:" + item.PadRight(30) + " aus " + ts.DisplayName + "'");
-                        Global.TeamsPs1.Add(@"Remove-UnifiedGroupLinks -Identity " + ts.TeamId + " -LinkType Owner -Links '" + item + "'");
+                        Global.TeamsPs1.Add(@"Remove-UnifiedGroupLinks -Identity " + ts.TeamId + " -LinkType Owner -Links '" + item + "' -Confirm");
                     }
                 }                
             }
@@ -172,7 +166,7 @@ namespace teams
                     {
                         Console.WriteLine("[+] Neuer Owner  : " + item.PadRight(30) + " -> " + ts.DisplayName);
                         Global.TeamsPs1.Add(@"Write-Host '[+] Neuer Owner: " + item.PadRight(30) + " -> " + ts.DisplayName + "'");
-                        Global.TeamsPs1.Add(@"Add-UnifiedGroupLinks -Identity " + ts.DisplayName.PadRight(6) + " -LinkType Owner  -Links '" + item + "'");
+                        Global.TeamsPs1.Add(@"Add-UnifiedGroupLinks -Identity " + ts.DisplayName.PadRight(6) + " -LinkType Owner  -Links '" + item + "' -Confirm");
                     }
                 }
                 foreach (var item in ts.Members)
@@ -183,7 +177,7 @@ namespace teams
                     {
                         Console.WriteLine("[+] Neuer Member : " + item.PadRight(30) + " -> " + ts.DisplayName);
                         Global.TeamsPs1.Add(@"Write-Host '[+] Neuer Member : " + item.PadRight(30) + " -> " + ts.DisplayName + "'");
-                        Global.TeamsPs1.Add(@"Add-UnifiedGroupLinks -Identity " + ts.DisplayName.PadRight(6) + " -LinkType Member -Links '" + item + "'");
+                        Global.TeamsPs1.Add(@"Add-UnifiedGroupLinks -Identity " + ts.DisplayName.PadRight(6) + " -LinkType Member -Links '" + item + "' -Confirm");
                     }
                 }
             }

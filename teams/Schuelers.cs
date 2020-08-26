@@ -384,10 +384,7 @@ ORDER BY ausgetreten DESC, klasse, schueler.name_1, schueler.name_2", connection
                         schueler.Id = theRow["AtlantisSchuelerId"] == null ? -99 : Convert.ToInt32(theRow["AtlantisSchuelerId"]);
 
 
-                        if (schueler.Id == 150896)
-                        {
-                            string a = "";
-                        }
+                        
                         schueler.Nachname = theRow["Nachname"] == null ? "" : theRow["Nachname"].ToString();
                         schueler.Vorname = theRow["Vorname"] == null ? "" : theRow["Vorname"].ToString();
                         schueler.Klasse = theRow["Klasse"] == null ? "" : theRow["Klasse"].ToString();
@@ -467,15 +464,19 @@ WHERE SCHOOLYEAR_ID =" + aktSj + ";";
                             schueler.Anmeldename = Global.SafeGetString(oleDbDataReader, 5);
                             schueler.GeschlechtMw = Global.SafeGetString(oleDbDataReader, 6);
                             schueler.IdUntis = oleDbDataReader.GetInt32(7);
+                            
+                            var atlantisschueler = (from a in atlantisschulers
+                                                    where a.Nachname == schueler.Nachname
+                                                    where a.Vorname == schueler.Vorname
+                                                    where a.Gebdat.Date == schueler.Gebdat.Date
+                                                    select a).FirstOrDefault();
 
-                            // Die idUntis wird vorhandenen Schülern zugewiesen
-                            var schü = (from s in this where s.Anmeldename == schueler.Anmeldename select s).FirstOrDefault();
-                            if (schü != null)
-                            {
-                                schü.IdUntis = schueler.IdUntis;
-                            }
 
-                            schueler.Klasse = (from k in klasses where k.IdUntis == oleDbDataReader.GetInt32(8) select k.NameUntis).FirstOrDefault();
+                            schueler.Klasse = (from a in atlantisschulers
+                                               where a.Nachname == schueler.Nachname
+                                               where a.Vorname == schueler.Vorname
+                                               where a.Gebdat.Date == schueler.Gebdat.Date
+                                               select a.Klasse).FirstOrDefault();
 
                             schueler.Reliabmeldung = (from a in atlantisschulers
                                                       where a.Nachname == schueler.Nachname
