@@ -157,17 +157,6 @@ namespace teams
 
                 foreach (var teamId in identity)
                 {
-                    foreach (var item in ts.Owners)
-                    {
-                        // Jeder Owner, der im Soll aber nicht im Ist existiert, wird angelegt
-
-                        if (!(from o in teamsIst where o.DisplayName == ts.DisplayName where o.Owners.Contains(item) select o.Owners.Contains(item)).Any())
-                        {
-                            Console.WriteLine("[+] Neuer Owner  : " + item.PadRight(30) + " -> " + ts.DisplayName);
-                            Global.TeamsPs1.Add(@"Write-Host '[+] Neuer Owner: " + item.PadRight(30) + " -> " + ts.DisplayName + "'");
-                            Global.TeamsPs1.Add(@"Add-UnifiedGroupLinks -Identity " + teamId + " -LinkType Owner  -Links '" + item + "' -Confirm");
-                        }
-                    }
                     foreach (var item in ts.Members)
                     {
                         // Jeder Member, der im Soll aber nicht im Ist existiert, wird angelegt
@@ -179,6 +168,17 @@ namespace teams
                             Global.TeamsPs1.Add(@"Add-UnifiedGroupLinks -Identity " + teamId + " -LinkType Member -Links '" + item + "' -Confirm");
                         }
                     }
+                    foreach (var item in ts.Owners)
+                    {
+                        // Jeder Owner, der im Soll aber nicht im Ist existiert, wird angelegt
+
+                        if (!(from o in teamsIst where o.DisplayName == ts.DisplayName where o.Owners.Contains(item) select o.Owners.Contains(item)).Any())
+                        {
+                            Console.WriteLine("[+] Neuer Owner  : " + item.PadRight(30) + " -> " + ts.DisplayName);
+                            Global.TeamsPs1.Add(@"Write-Host '[+] Neuer Owner: " + item.PadRight(30) + " -> " + ts.DisplayName + "'");
+                            Global.TeamsPs1.Add(@"Add-UnifiedGroupLinks -Identity " + teamId + " -LinkType Owner  -Links '" + item + "' -Confirm");
+                        }
+                    }                    
                 }                
             }
         }
