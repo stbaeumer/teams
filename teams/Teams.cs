@@ -55,10 +55,14 @@ namespace teams
                     zeile.AddRange(currentLine.Replace("\"", "").Replace("\\", "").Split(','));
 
                     // Prüfe, ob es ein Klassenteam ist
+                    if (zeile[1] == "EE18A")
+                    {
+                        string a = "";
+                    }
 
                     if ((from k in klasses where k.NameUntis == zeile[1] select k).Any())
                     {
-                        var x = (from t in this where t.DisplayName == zeile[1] select t).FirstOrDefault();
+                        var x = (from t in this where t.DisplayName == zeile[1] where t.TeamId == zeile[0] select t).FirstOrDefault();
 
                         if (x == null)
                         {
@@ -86,28 +90,52 @@ namespace teams
                 }
             }
             Console.WriteLine("Insgesamt " + this.Count + " Klassengruppen in Office365 vorhanden.");
+
+            var zz = (from x in this where x.DisplayName == "EE18A" select x).ToList();
+        }
+
+        internal void DoppelteKlassenFinden()
+        {
+            int x = 0;
+            foreach (var item in this)
+            {
+                if (item.DisplayName == "FS20B")
+                {
+                    int ii = (from i in this where i.DisplayName == item.DisplayName select i).Count();
+                    string a = "";
+                }
+                if ((from i in this where i.DisplayName == item.DisplayName select i).Count() > 1)
+                {
+                    Console.WriteLine("Die Klasse " + item.DisplayName + " ist mehrfach als O365-Gruppe angelegt.");
+                    x++;
+                }
+            }
+            if (x > 0)
+            {
+                Console.WriteLine("ENTER");
+
+                //Console.ReadKey();
+            }
         }
 
         internal void OwnerUndMemberLöschen(Teams klassenTeamsSoll)
         {
             foreach (var ts in this)
             {
-                var identity = (from t in this where t.DisplayName == ts.DisplayName select t.TeamId).FirstOrDefault();
-
-                if(identity == null || identity == "")
-                {
-                    string a = "";
-                }
-
                 foreach (var item in ts.Members)
                 {
-                    // Jeder Member, der im Ist aber nicht im Soll existiert, wird gelöscht 
+                    // Member, die auch Owner sind, werden nicht gelöscht
 
-                    if (!(from o in klassenTeamsSoll where o.Members.Contains(item) select o).Any())
+                    if (!(from dd in klassenTeamsSoll where dd.DisplayName == ts.DisplayName where dd.Owners.Contains(item) select dd.Owners.Contains(item)).Any())
                     {
-                        Console.WriteLine("[-] Member entfernen:" + item.PadRight(30) + " aus " + ts.DisplayName);
-                        Global.TeamsPs1.Add(@"Write-Host '[-] Member entfernen: " + item.PadRight(30) + " aus " + ts.DisplayName + "'");
-                        Global.TeamsPs1.Add(@"Remove-UnifiedGroupLinks -Identity " + ts.DisplayName.PadRight(6) + " -LinkType Member  -Links '" + item + "'");
+                        // Member, der im Ist aber nicht im Soll existiert, wird gelöscht 
+
+                        if (!(from o in klassenTeamsSoll where o.DisplayName == ts.DisplayName where o.Members.Contains(item) select o).Any())
+                        {
+                            Console.WriteLine("[-] Member entfernen:" + item.PadRight(30) + " aus " + ts.DisplayName);
+                            Global.TeamsPs1.Add(@"Write-Host '[-] Member entfernen: " + item.PadRight(30) + " aus " + ts.DisplayName + "'");
+                            Global.TeamsPs1.Add(@"Remove-UnifiedGroupLinks -Identity " + ts.TeamId + " -LinkType Member  -Links '" + item + "'");
+                        }
                     }
                 }
 
@@ -115,11 +143,11 @@ namespace teams
                 {
                     // Jeder Owner, der im Ist aber nicht im Soll existiert, wird gelöscht
 
-                    if (!(from o in klassenTeamsSoll where o.Owners.Contains(item) select o).Any())
+                    if (!(from o in klassenTeamsSoll where o.DisplayName == ts.DisplayName where o.Owners.Contains(item) select o.Owners.Contains(item)).Any())
                     {
                         Console.WriteLine("[-] Owner  entfernen:" + item.PadRight(30) + " aus " + ts.DisplayName);
                         Global.TeamsPs1.Add(@"Write-Host '[-] Owner  entfernen:" + item.PadRight(30) + " aus " + ts.DisplayName + "'");
-                        Global.TeamsPs1.Add(@"Remove-UnifiedGroupLinks -Identity " + ts.DisplayName.PadRight(6) + " -LinkType Owner -Links '" + item + "'");
+                        Global.TeamsPs1.Add(@"Remove-UnifiedGroupLinks -Identity " + ts.TeamId + " -LinkType Owner -Links '" + item + "'");
                     }
                 }                
             }
@@ -140,7 +168,7 @@ namespace teams
                 {
                     // Jeder Owner, der im Soll aber nicht im Ist existiert, wird angelegt
 
-                    if (!(from o in teamsIst where o.Owners.Contains(item) select o).Any())
+                    if (!(from o in teamsIst where o.DisplayName == ts.DisplayName where o.Owners.Contains(item) select o.Owners.Contains(item)).Any())
                     {
                         Console.WriteLine("[+] Neuer Owner  : " + item.PadRight(30) + " -> " + ts.DisplayName);
                         Global.TeamsPs1.Add(@"Write-Host '[+] Neuer Owner: " + item.PadRight(30) + " -> " + ts.DisplayName + "'");
@@ -151,7 +179,7 @@ namespace teams
                 {
                     // Jeder Member, der im Soll aber nicht im Ist existiert, wird angelegt
 
-                    if (!(from o in teamsIst where o.Members.Contains(item) select o).Any())
+                    if (!(from o in teamsIst where o.DisplayName == ts.DisplayName where o.Members.Contains(item) select o).Any())
                     {
                         Console.WriteLine("[+] Neuer Member : " + item.PadRight(30) + " -> " + ts.DisplayName);
                         Global.TeamsPs1.Add(@"Write-Host '[+] Neuer Member : " + item.PadRight(30) + " -> " + ts.DisplayName + "'");

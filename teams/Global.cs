@@ -26,7 +26,7 @@ namespace teams
             return @"
 
 # if ( ([System.Io.fileinfo]'C:\users\bm\Documents\GruppenOwnerMembers.csv').LastWriteTime.Date -ge [datetime]::Today ){     
-if ( true ){     
+if ( $FALSE ){     
      'Die Datei C:\users\bm\Documents\GruppenOwnerMembers.csv muss nicht aktualisiert werden.'
 }else{
 
@@ -93,8 +93,8 @@ if ( true ){
   CSV File
 .NOTES
   Version:        1.0
-  Author:         Stefan Bäumer
-  Creation Date:  20200820
+  Author:         stefan.baeumer@berufskolleg-borken.de
+  Creation Date:  " + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString() + @"
   Purpose/Change: Initial version
   
 .EXAMPLE

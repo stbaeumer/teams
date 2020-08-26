@@ -56,7 +56,9 @@ namespace teams
 
                 Teams klassenTeamsSoll = new Teams(klasses, lehrers, schuelers, unterrichts);
 
-                klassenTeamsSoll.FehlendeKlassenAnlegen(teamsIst);
+                //klassenTeamsSoll.FehlendeKlassenAnlegen(teamsIst);
+
+                teamsIst.DoppelteKlassenFinden();
 
                 klassenTeamsSoll.OwnerUndMemberAnlegen(teamsIst);
 
@@ -66,7 +68,7 @@ namespace teams
                 Global.TeamsPs1.Add("Write-Host 'Ende der Verarbeitung'");
                 File.AppendAllLines(Global.TeamsPs, Global.TeamsPs1);
 
-                Process.Start("powershell_ise.exe", Global.TeamsPs);
+                //Process.Start("powershell_ise.exe", Global.TeamsPs);
 
                 Console.WriteLine("Verarbeitung beendet");
             }
