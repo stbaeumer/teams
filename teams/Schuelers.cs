@@ -382,9 +382,7 @@ ORDER BY ausgetreten DESC, klasse, schueler.name_1, schueler.name_2", connection
                     {
                         var schueler = new Schueler();
                         schueler.Id = theRow["AtlantisSchuelerId"] == null ? -99 : Convert.ToInt32(theRow["AtlantisSchuelerId"]);
-
-
-                        
+                                                
                         schueler.Nachname = theRow["Nachname"] == null ? "" : theRow["Nachname"].ToString();
                         schueler.Vorname = theRow["Vorname"] == null ? "" : theRow["Vorname"].ToString();
                         schueler.Klasse = theRow["Klasse"] == null ? "" : theRow["Klasse"].ToString();
@@ -418,7 +416,16 @@ ORDER BY ausgetreten DESC, klasse, schueler.name_1, schueler.name_2", connection
                         }
                     }
                 }
-                
+
+                var cc = (from k in atlantisschulers where k.Status == "A" && k.Austrittsdatum.Date <= DateTime.Now.Date select k).ToList();
+
+                Console.WriteLine("Ausgetretene Schülerinnen und Schüler, deren Status 'aktiv' ist.");
+
+                foreach (var item in cc)
+                {
+                    Console.WriteLine(item.Nachname + " " + item.Vorname + " " + item.Klasse);
+                }
+
                 using (OleDbConnection oleDbConnection = new OleDbConnection(Global.ConnectionStringUntis))
                 {
                     string sch = "";
