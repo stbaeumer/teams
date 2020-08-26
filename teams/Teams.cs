@@ -122,34 +122,40 @@ namespace teams
         {
             foreach (var ts in this)
             {
+                foreach (var item in ts.Owners)
+                {
+                    if (!item.Contains("verena.baumeister@b"))
+                    {
+                        // Jeder Owner, der im Ist aber nicht im Soll existiert, wird gelöscht
+
+                        if (!(from o in klassenTeamsSoll where o.DisplayName == ts.DisplayName where o.Owners.Contains(item) select o.Owners.Contains(item)).Any())
+                        {
+                            Console.WriteLine("[-] Owner  entfernen:" + item.PadRight(30) + " aus " + ts.DisplayName);
+                            Global.TeamsPs1.Add(@"Write-Host '[-] Owner  entfernen: " + item.PadRight(30) + " aus " + ts.DisplayName + "'");
+                            Global.TeamsPs1.Add(@"Remove-UnifiedGroupLinks -Identity " + ts.TeamId + " -LinkType Owner -Links '" + item + "'");
+                        }
+                    }                    
+                }
+
                 foreach (var item in ts.Members)
                 {
-                    // Member, die auch Owner sind, werden nicht gelöscht
-
-                    if (!(from dd in klassenTeamsSoll where dd.DisplayName == ts.DisplayName where dd.Owners.Contains(item) select dd.Owners.Contains(item)).Any())
+                    if (!item.Contains("verena.baumeister@b"))
                     {
-                        // Member, der im Ist aber nicht im Soll existiert, wird gelöscht 
+                        // Member, die auch Owner sind, werden nicht gelöscht
 
-                        if (!(from o in klassenTeamsSoll where o.DisplayName == ts.DisplayName where o.Members.Contains(item) select o).Any())
+                        if (!(from dd in klassenTeamsSoll where dd.DisplayName == ts.DisplayName where dd.Owners.Contains(item) select dd.Owners.Contains(item)).Any())
                         {
-                            Console.WriteLine("[-] Member entfernen:" + item.PadRight(30) + " aus " + ts.DisplayName);
-                            Global.TeamsPs1.Add(@"Write-Host '[-] Member entfernen: " + item.PadRight(30) + " aus " + ts.DisplayName + "'");
-                            Global.TeamsPs1.Add(@"Remove-UnifiedGroupLinks -Identity " + ts.TeamId + " -LinkType Member  -Links '" + item + "' -Confirm:$false");
+                            // Member, der im Ist aber nicht im Soll existiert, wird gelöscht 
+
+                            if (!(from o in klassenTeamsSoll where o.DisplayName == ts.DisplayName where o.Members.Contains(item) select o).Any())
+                            {
+                                Console.WriteLine("[-] Member entfernen:" + item.PadRight(30) + " aus " + ts.DisplayName);
+                                Global.TeamsPs1.Add(@"Write-Host '[-] Member entfernen: " + item.PadRight(30) + " aus " + ts.DisplayName + "'");
+                                Global.TeamsPs1.Add(@"Remove-UnifiedGroupLinks -Identity " + ts.TeamId + " -LinkType Member  -Links '" + item + "'");
+                            }
                         }
                     }
                 }
-
-                foreach (var item in ts.Owners)
-                {
-                    // Jeder Owner, der im Ist aber nicht im Soll existiert, wird gelöscht
-
-                    if (!(from o in klassenTeamsSoll where o.DisplayName == ts.DisplayName where o.Owners.Contains(item) select o.Owners.Contains(item)).Any())
-                    {
-                        Console.WriteLine("[-] Owner  entfernen:" + item.PadRight(30) + " aus " + ts.DisplayName);
-                        Global.TeamsPs1.Add(@"Write-Host '[-] Owner  entfernen:" + item.PadRight(30) + " aus " + ts.DisplayName + "'");
-                        Global.TeamsPs1.Add(@"Remove-UnifiedGroupLinks -Identity " + ts.TeamId + " -LinkType Owner -Links '" + item + "' -Confirm:$false");
-                    }
-                }                
             }
         }
 

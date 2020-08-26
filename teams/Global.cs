@@ -31,7 +31,7 @@ if ( ([System.Io.fileinfo]'C:\users\bm\Documents\GruppenOwnerMembers.csv').LastW
 }else{
 
     Write-Host -ForegroundColor Green 'Loading all Office 365 Groups'
-    $Groups = Get-UnifiedGroup -ResultSize Unlimited
+    $Groups = Get-UnifiedGroup -ResultSize Unlimited  | Sort-Object DisplayName
 
     # Process Groups
     $GroupsCSV = @()
