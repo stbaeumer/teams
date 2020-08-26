@@ -12,7 +12,7 @@ namespace teams
             foreach (var klasse in (from k in klasses where (k.Klassenleitungen != null && k.Klassenleitungen.Count > 0 && k.Klassenleitungen[0] != null) select k))
             {
                 Team klassenteamSoll = new Team(klasse.NameUntis);
-
+                
                 var o = (from l in lehrers
                          where ((from u in unterrichts where u.KlasseKürzel == klasse.NameUntis select u.LehrerKürzel).ToList()).Contains(l.Kürzel)
                          where l.Mail != null
@@ -21,8 +21,10 @@ namespace teams
 
                 foreach (var item in o)
                 {
+                    klassenteamSoll.Members.Add(item); // Owner müssen immer auch member sein.
                     klassenteamSoll.Owners.Add(item);
                 }
+
 
                 var m = (from s in schuelers
                          where s.Klasse == klasse.NameUntis
@@ -85,7 +87,11 @@ namespace teams
                     }
                 }
             }
-            Console.WriteLine("Insgesamt " + this.Count + " Klassengruppen in Office365 vorhanden.");            
+            Console.WriteLine("Insgesamt " + this.Count + " Klassengruppen in Office365 vorhanden.");
+            if (this.Count < 100)
+            {
+                throw new Exception("Die Anzahl der existierenden Teams ist zu niedrig.");                
+            }
         }
 
         internal void DoppelteKlassenFinden()
@@ -128,7 +134,7 @@ namespace teams
                         {
                             Console.WriteLine("[-] Member entfernen:" + item.PadRight(30) + " aus " + ts.DisplayName);
                             Global.TeamsPs1.Add(@"Write-Host '[-] Member entfernen: " + item.PadRight(30) + " aus " + ts.DisplayName + "'");
-                            Global.TeamsPs1.Add(@"Remove-UnifiedGroupLinks -Identity " + ts.TeamId + " -LinkType Member  -Links '" + item + "' -Confirm");
+                            Global.TeamsPs1.Add(@"Remove-UnifiedGroupLinks -Identity " + ts.TeamId + " -LinkType Member  -Links '" + item + "' -Confirm:$false");
                         }
                     }
                 }
@@ -141,7 +147,7 @@ namespace teams
                     {
                         Console.WriteLine("[-] Owner  entfernen:" + item.PadRight(30) + " aus " + ts.DisplayName);
                         Global.TeamsPs1.Add(@"Write-Host '[-] Owner  entfernen:" + item.PadRight(30) + " aus " + ts.DisplayName + "'");
-                        Global.TeamsPs1.Add(@"Remove-UnifiedGroupLinks -Identity " + ts.TeamId + " -LinkType Owner -Links '" + item + "' -Confirm");
+                        Global.TeamsPs1.Add(@"Remove-UnifiedGroupLinks -Identity " + ts.TeamId + " -LinkType Owner -Links '" + item + "' -Confirm:$false");
                     }
                 }                
             }
@@ -165,7 +171,7 @@ namespace teams
                         {
                             Console.WriteLine("[+] Neuer Member : " + item.PadRight(30) + " -> " + ts.DisplayName);
                             Global.TeamsPs1.Add(@"Write-Host '[+] Neuer Member : " + item.PadRight(30) + " -> " + ts.DisplayName + "'");
-                            Global.TeamsPs1.Add(@"Add-UnifiedGroupLinks -Identity " + teamId + " -LinkType Member -Links '" + item + "' -Confirm");
+                            Global.TeamsPs1.Add(@"Add-UnifiedGroupLinks -Identity " + teamId + " -LinkType Member -Links '" + item + "'");
                         }
                     }
                     foreach (var item in ts.Owners)
@@ -175,8 +181,8 @@ namespace teams
                         if (!(from o in teamsIst where o.DisplayName == ts.DisplayName where o.Owners.Contains(item) select o.Owners.Contains(item)).Any())
                         {
                             Console.WriteLine("[+] Neuer Owner  : " + item.PadRight(30) + " -> " + ts.DisplayName);
-                            Global.TeamsPs1.Add(@"Write-Host '[+] Neuer Owner: " + item.PadRight(30) + " -> " + ts.DisplayName + "'");
-                            Global.TeamsPs1.Add(@"Add-UnifiedGroupLinks -Identity " + teamId + " -LinkType Owner  -Links '" + item + "' -Confirm");
+                            Global.TeamsPs1.Add(@"Write-Host '[+] Neuer Owner  : " + item.PadRight(30) + " -> " + ts.DisplayName + "'");
+                            Global.TeamsPs1.Add(@"Add-UnifiedGroupLinks -Identity " + teamId + " -LinkType Owner  -Links '" + item + "'");
                         }
                     }                    
                 }                

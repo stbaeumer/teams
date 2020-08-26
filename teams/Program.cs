@@ -68,7 +68,7 @@ namespace teams
                 Global.TeamsPs1.Add("Write-Host 'Ende der Verarbeitung'");
                 File.AppendAllLines(Global.TeamsPs, Global.TeamsPs1);
 
-                Process.Start("powershell_ise.exe");
+                //Process.Start("powershell_ise.exe");
 
                 Console.WriteLine("Verarbeitung beendet");
             }
