@@ -151,35 +151,35 @@ namespace teams
         {
             foreach (var ts in this)
             {
-                var identity = (from t in teamsIst where t.DisplayName == ts.DisplayName select t.TeamId).FirstOrDefault();
+                var identity = (from t in teamsIst where t.DisplayName == ts.DisplayName select t.TeamId).ToList();
+                
+                // Für jedes Team, das den Namen der Klasse trägt, werden die Member eingefügt.
 
-                if (identity == null || identity == "")
+                foreach (var teamId in identity)
                 {
-                    string a = "";
-                }
-
-                foreach (var item in ts.Owners)
-                {
-                    // Jeder Owner, der im Soll aber nicht im Ist existiert, wird angelegt
-
-                    if (!(from o in teamsIst where o.DisplayName == ts.DisplayName where o.Owners.Contains(item) select o.Owners.Contains(item)).Any())
+                    foreach (var item in ts.Owners)
                     {
-                        Console.WriteLine("[+] Neuer Owner  : " + item.PadRight(30) + " -> " + ts.DisplayName);
-                        Global.TeamsPs1.Add(@"Write-Host '[+] Neuer Owner: " + item.PadRight(30) + " -> " + ts.DisplayName + "'");
-                        Global.TeamsPs1.Add(@"Add-UnifiedGroupLinks -Identity " + ts.DisplayName.PadRight(6) + " -LinkType Owner  -Links '" + item + "' -Confirm");
-                    }
-                }
-                foreach (var item in ts.Members)
-                {
-                    // Jeder Member, der im Soll aber nicht im Ist existiert, wird angelegt
+                        // Jeder Owner, der im Soll aber nicht im Ist existiert, wird angelegt
 
-                    if (!(from o in teamsIst where o.DisplayName == ts.DisplayName where o.Members.Contains(item) select o).Any())
-                    {
-                        Console.WriteLine("[+] Neuer Member : " + item.PadRight(30) + " -> " + ts.DisplayName);
-                        Global.TeamsPs1.Add(@"Write-Host '[+] Neuer Member : " + item.PadRight(30) + " -> " + ts.DisplayName + "'");
-                        Global.TeamsPs1.Add(@"Add-UnifiedGroupLinks -Identity " + ts.DisplayName.PadRight(6) + " -LinkType Member -Links '" + item + "' -Confirm");
+                        if (!(from o in teamsIst where o.DisplayName == ts.DisplayName where o.Owners.Contains(item) select o.Owners.Contains(item)).Any())
+                        {
+                            Console.WriteLine("[+] Neuer Owner  : " + item.PadRight(30) + " -> " + ts.DisplayName);
+                            Global.TeamsPs1.Add(@"Write-Host '[+] Neuer Owner: " + item.PadRight(30) + " -> " + ts.DisplayName + "'");
+                            Global.TeamsPs1.Add(@"Add-UnifiedGroupLinks -Identity " + teamId + " -LinkType Owner  -Links '" + item + "' -Confirm");
+                        }
                     }
-                }
+                    foreach (var item in ts.Members)
+                    {
+                        // Jeder Member, der im Soll aber nicht im Ist existiert, wird angelegt
+
+                        if (!(from o in teamsIst where o.DisplayName == ts.DisplayName where o.Members.Contains(item) select o).Any())
+                        {
+                            Console.WriteLine("[+] Neuer Member : " + item.PadRight(30) + " -> " + ts.DisplayName);
+                            Global.TeamsPs1.Add(@"Write-Host '[+] Neuer Member : " + item.PadRight(30) + " -> " + ts.DisplayName + "'");
+                            Global.TeamsPs1.Add(@"Add-UnifiedGroupLinks -Identity " + teamId + " -LinkType Member -Links '" + item + "' -Confirm");
+                        }
+                    }
+                }                
             }
         }
 
