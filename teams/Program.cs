@@ -18,6 +18,8 @@ namespace teams
                 Global.TeamsPs = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal) + @"\\Teams.ps1";
                 Global.GruppenMemberPs = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal) + @"\\GruppenOwnerMembers.csv";
 
+                File.WriteAllText(Global.TeamsPs, "<# Skript zum tagesaktuellen Abgleich der Klassen aus Atlantis / Untis mit Office 365 #>");
+                File.AppendAllText(Global.TeamsPs, "<# " + DateTime.Now.Date.ToShortDateString() + " " + DateTime.Now.ToShortTimeString()  + " #>");
                 Global.TeamsPs1 = new List<string>();
                 aktSj.Add((DateTime.Now.Month >= 8 ? DateTime.Now.Year : DateTime.Now.Year - 1).ToString());
                 aktSj.Add((DateTime.Now.Month >= 8 ? DateTime.Now.Year + 1 : DateTime.Now.Year).ToString());
@@ -38,7 +40,7 @@ namespace teams
 
                 try
                 {
-                    File.WriteAllText(Global.TeamsPs, Global.Auth());
+                    File.AppendAllText(Global.TeamsPs, Global.Auth());
                     File.AppendAllText(Global.TeamsPs, Global.GruppenAuslesen());
                 }
                 catch (Exception ex)
@@ -68,7 +70,7 @@ namespace teams
                 Global.TeamsPs1.Add("Write-Host 'Ende der Verarbeitung'");
                 File.AppendAllLines(Global.TeamsPs, Global.TeamsPs1);
 
-                //Process.Start("powershell_ise.exe");
+                Process.Start("powershell_ise.exe");
 
                 Console.WriteLine("Verarbeitung beendet");
             }

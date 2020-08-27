@@ -80,26 +80,7 @@ if ( ([System.Io.fileinfo]'C:\users\bm\Documents\GruppenOwnerMembers.csv').LastW
 
         internal static string Auth()
         {
-            return @"<#
-.SYNOPSIS
-  Skript zum tagesaktuellen Abgleich der Klassen aus Atlantis / Untis mit Office 365
-.DESCRIPTION
-  Skript zum tagesaktuellen Abgleich der Klassen aus Atlantis / Untis mit Office 365
-.PARAMETER
-  None
-.INPUTS
-  None
-.OUTPUTS
-  CSV File
-.NOTES
-  Version:        1.0
-  Author:         stefan.baeumer@berufskolleg-borken.de
-  Creation Date:  " + DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString() + @"
-  Purpose/Change: Initial version
-  
-.EXAMPLE
-  None
-#>
+            return @"
 
 $testSession = Get-PSSession
 if(-not($testSession))

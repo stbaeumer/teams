@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.OleDb;
 using System.Globalization;
+using System.IO;
 
 namespace teams
 {
@@ -134,6 +135,7 @@ WHERE (((SCHOOLYEAR_ID)= " + aktSj + ") AND ((LessonGroup.SCHOOL_ID)=177659)) OR
                     };
                     oleDbDataReader.Close();
                     Console.WriteLine("");
+                    File.AppendAllText(Global.TeamsPs, "<# Anzahl Unterrichtsgruppen : " + this.Count + " #>");
 
                 }
                 catch (Exception ex)

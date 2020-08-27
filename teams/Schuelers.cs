@@ -518,6 +518,7 @@ WHERE SCHOOLYEAR_ID =" + aktSj + ";";
                         oleDbConnection.Close();
 
                         Console.WriteLine(this.Count);
+                        File.AppendAllText(Global.TeamsPs, "<# Anzahl Schüler : " + this.Count + " #>");
                     }
                 }
             }

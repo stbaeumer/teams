@@ -40,7 +40,8 @@ namespace teams
                 this.Add(klassenteamSoll);
             }
 
-            Console.WriteLine("Insgesamt " + this.Count + " Klassengruppen müssen im Office365 vorhanden sein.");
+            Console.WriteLine("Insgesamt müssen " + this.Count + " Klassengruppen im Office365 angelegt sein.");
+            File.AppendAllText(Global.TeamsPs, "<# Insgesamt müssen " + this.Count + " Klassengruppen im Office365 angelegt sein. #>");
         }
 
         public Teams(string pfad, Klasses klasses)
@@ -87,7 +88,9 @@ namespace teams
                     }
                 }
             }
-            Console.WriteLine("Insgesamt " + this.Count + " Klassengruppen in Office365 vorhanden.");
+            Console.WriteLine("Insgesamt " + this.Count + " Klassengruppen in Office365 vorhanden.");            
+            File.AppendAllText(Global.TeamsPs, "<# Insgesamt " + this.Count + " Klassengruppen in Office365 vorhanden. #>");
+
             if (this.Count < 100)
             {
                 throw new Exception("Die Anzahl der existierenden Teams ist zu niedrig.");                
