@@ -19,7 +19,8 @@ namespace teams
                 Global.TeamsPs = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal) + @"\\Teams.ps1";
                 Global.GruppenMemberPs = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal) + @"\\GruppenOwnerMembers.csv";
 
-                File.WriteAllText(Global.TeamsPs, "<# Skript zum tagesaktuellen Abgleich der Klassen ä aus Atlantis / Untis mit Office 365 #>", Encoding.UTF8);
+                File.WriteAllText(Global.TeamsPs, @"<# Skript zum tagesaktuellen Abgleich der Klassen aus Atlantis / Untis mit Office 365 #>
+", Encoding.UTF8);
                 File.AppendAllLines(Global.TeamsPs, new List<string>() { "<# " + DateTime.Now.Date.ToShortDateString() + " " + DateTime.Now.ToShortTimeString() + "" }, Encoding.UTF8);
                 Global.TeamsPs1 = new List<string>();
                 aktSj.Add((DateTime.Now.Month >= 8 ? DateTime.Now.Year : DateTime.Now.Year - 1).ToString());
@@ -51,7 +52,7 @@ namespace teams
 
                 try
                 {
-                    File.AppendAllLines(Global.TeamsPs, new List<string>() { "", "$confirm = true" }, Encoding.UTF8);
+                    File.AppendAllLines(Global.TeamsPs, new List<string>() { "", "$confirm = $true" }, Encoding.UTF8);
                     File.AppendAllText(Global.TeamsPs, Global.Auth(), Encoding.UTF8);
                     File.AppendAllText(Global.TeamsPs, Global.GruppenAuslesen(), Encoding.UTF8);
                 }
@@ -59,8 +60,7 @@ namespace teams
                 {
                     throw new Exception(" Die Datei Teams.ps1 ist von einem anderen Prozess gesperrt.\n\n" + ex);                    
                 }
-
-                
+                                
                 //klassenTeamsSoll.FehlendeKlassenAnlegen(teamsIst);
 
                 teamsIst.DoppelteKlassenFinden();
@@ -68,8 +68,7 @@ namespace teams
                 klassenTeamsSoll.OwnerUndMemberAnlegen(teamsIst);
 
                 teamsIst.OwnerUndMemberLöschen(klassenTeamsSoll);
-
-                
+                                
                 Global.TeamsPs1.Add("Write-Host 'Ende der Verarbeitung'");
                 File.AppendAllLines(Global.TeamsPs, Global.TeamsPs1, Encoding.UTF8);
 
