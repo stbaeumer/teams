@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.OleDb;
 using System.IO;
+using System.Text;
 
 namespace teams
 {
@@ -38,7 +39,7 @@ WHERE Subjects.Schoolyear_id = " + aktSj + " AND Subjects.Deleted=No  AND ((Subj
                     };
 
                     Console.WriteLine(("Fächer " + ".".PadRight(this.Count / 150, '.')).PadRight(48, '.') + (" " + this.Count).ToString().PadLeft(4), '.');
-                    File.AppendAllText(Global.TeamsPs, "<# Anzahl Fächer : " + this.Count + " #>");
+                    File.AppendAllLines(Global.TeamsPs, new List<string>() { "<# Anzahl Fächer : " + this.Count + "" }, Encoding.UTF8);
 
                     oleDbDataReader.Close();
                 }

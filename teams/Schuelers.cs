@@ -382,13 +382,14 @@ ORDER BY ausgetreten DESC, klasse, schueler.name_1, schueler.name_2", connection
                     {
                         var schueler = new Schueler();
                         schueler.Id = theRow["AtlantisSchuelerId"] == null ? -99 : Convert.ToInt32(theRow["AtlantisSchuelerId"]);
-                                                
+
+                       
                         schueler.Nachname = theRow["Nachname"] == null ? "" : theRow["Nachname"].ToString();
                         schueler.Vorname = theRow["Vorname"] == null ? "" : theRow["Vorname"].ToString();
                         schueler.Klasse = theRow["Klasse"] == null ? "" : theRow["Klasse"].ToString();
                         schueler.Gebdat = theRow["Gebdat"].ToString().Length < 3 ? new DateTime() : DateTime.ParseExact(theRow["Gebdat"].ToString(), "dd.MM.yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
                         schueler.Telefon = theRow["telefon"] == null ? "" : theRow["telefon"].ToString();
-                        schueler.Mail = schueler.Kurzname + "@student.berufskolleg-borken.de";
+                        schueler.Mail = schueler.Kurzname + "@students.berufskolleg-borken.de";
                         schueler.Eintrittsdatum = theRow["Aufnahmedatum"].ToString().Length < 3 ? new DateTime() : DateTime.ParseExact(theRow["Aufnahmedatum"].ToString(), "dd.MM.yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
 
                         schueler.AktuellJN = theRow["AktuellJN"] == null ? "" : theRow["AktuellJN"].ToString();
@@ -405,6 +406,11 @@ ORDER BY ausgetreten DESC, klasse, schueler.name_1, schueler.name_2", connection
 
                         schueler.LSSchulnummer = theRow["LSSchulnummer"] == null ? "" : theRow["LSSchulnummer"].ToString();
 
+                        if (schueler.Vorname == "Tarik Lukas")
+                        {
+                            string a = "";
+                        }
+
                         if (schueler.Bezugsjahr == (DateTime.Now.Month >= 8 ? DateTime.Now.Year : DateTime.Now.Year - 1) && schueler.Status != "VB" && schueler.Status != "8" && schueler.Status != "9" && schueler.Klasse != "Z" && schueler.AktuellJN == "J")
                         {
                             // Duplikate werden verhindert.
@@ -416,8 +422,8 @@ ORDER BY ausgetreten DESC, klasse, schueler.name_1, schueler.name_2", connection
                         }
                     }
                 }
-
-                var cc = (from k in atlantisschulers where k.Status == "A" && k.Austrittsdatum.Date <= DateTime.Now.Date select k).ToList();
+                
+                var cc = (from k in atlantisschulers where k.Id == 153630 select k).ToList();
 
                 Console.WriteLine("Ausgetretene Schülerinnen und Schüler, deren Status 'aktiv' ist.");
 
@@ -468,6 +474,11 @@ WHERE SCHOOLYEAR_ID =" + aktSj + ";";
 
                             sch = schueler.Nachname + ", " + schueler.Vorname;
 
+
+                            if (schueler.Vorname == "Tarik Lukas")
+                            {
+                                string a = "";
+                            }
                             schueler.Anmeldename = Global.SafeGetString(oleDbDataReader, 5);
                             schueler.GeschlechtMw = Global.SafeGetString(oleDbDataReader, 6);
                             schueler.IdUntis = oleDbDataReader.GetInt32(7);
@@ -518,7 +529,7 @@ WHERE SCHOOLYEAR_ID =" + aktSj + ";";
                         oleDbConnection.Close();
 
                         Console.WriteLine(this.Count);
-                        File.AppendAllText(Global.TeamsPs, "<# Anzahl Schüler : " + this.Count + " #>");
+                        File.AppendAllLines(Global.TeamsPs, new List<string>() { "<# Anzahl Schüler : " + this.Count + "" }, Encoding.UTF8);
                     }
                 }
             }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace teams
 {
@@ -11,6 +12,10 @@ namespace teams
         {
             foreach (var klasse in (from k in klasses where (k.Klassenleitungen != null && k.Klassenleitungen.Count > 0 && k.Klassenleitungen[0] != null) select k))
             {
+                if (klasse.NameUntis == "FS20B")
+                {
+                    string a = "";
+                }
                 Team klassenteamSoll = new Team(klasse.NameUntis);
                 
                 var o = (from l in lehrers
@@ -34,6 +39,10 @@ namespace teams
 
                 foreach (var item in m)
                 {
+                    if (item.Contains("kt153630"))
+                    {
+                        string a = "";
+                    }
                     klassenteamSoll.Members.Add(item);
                 }
 
@@ -41,7 +50,7 @@ namespace teams
             }
 
             Console.WriteLine("Insgesamt müssen " + this.Count + " Klassengruppen im Office365 angelegt sein.");
-            File.AppendAllText(Global.TeamsPs, "<# Insgesamt müssen " + this.Count + " Klassengruppen im Office365 angelegt sein. #>");
+            File.AppendAllLines(Global.TeamsPs, new List<string>() { "<# Insgesamt müssen " + this.Count + " Klassengruppen im Office365 angelegt sein. #>" }, Encoding.UTF8);
         }
 
         public Teams(string pfad, Klasses klasses)
@@ -88,8 +97,8 @@ namespace teams
                     }
                 }
             }
-            Console.WriteLine("Insgesamt " + this.Count + " Klassengruppen in Office365 vorhanden.");            
-            File.AppendAllText(Global.TeamsPs, "<# Insgesamt " + this.Count + " Klassengruppen in Office365 vorhanden. #>");
+            Console.WriteLine("Insgesamt " + this.Count + " Klassengruppen in Office365 vorhanden.");
+            File.AppendAllLines(Global.TeamsPs, new List<string>() { "<# Insgesamt " + this.Count + " Klassengruppen in Office365 vorhanden. #>" });
 
             if (this.Count < 100)
             {
@@ -135,7 +144,7 @@ namespace teams
                         {
                             Console.WriteLine("[-] Owner  entfernen:" + item.PadRight(30) + " aus " + ts.DisplayName);
                             Global.TeamsPs1.Add(@"Write-Host '[-] Owner  entfernen: " + item.PadRight(30) + " aus " + ts.DisplayName + "'");
-                            Global.TeamsPs1.Add(@"Remove-UnifiedGroupLinks -Identity " + ts.TeamId + " -LinkType Owner -Links '" + item + "'"); // -Confirm:$false
+                            Global.TeamsPs1.Add(@"Remove-UnifiedGroupLinks -Identity " + ts.TeamId + " -LinkType Owner -Links '" + item + "' -Confirm:$confirm"); // -Confirm:$false
                         }
                     }                    
                 }
@@ -154,7 +163,7 @@ namespace teams
                             {
                                 Console.WriteLine("[-] Member entfernen:" + item.PadRight(30) + " aus " + ts.DisplayName);
                                 Global.TeamsPs1.Add(@"Write-Host '[-] Member entfernen: " + item.PadRight(30) + " aus " + ts.DisplayName + "'");
-                                Global.TeamsPs1.Add(@"Remove-UnifiedGroupLinks -Identity " + ts.TeamId + " -LinkType Member  -Links '" + item + "'");
+                                Global.TeamsPs1.Add(@"Remove-UnifiedGroupLinks -Identity " + ts.TeamId + " -LinkType Member  -Links '" + item + "' -Confirm:$confirm");
                             }
                         }
                     }
@@ -164,34 +173,53 @@ namespace teams
 
         internal void OwnerUndMemberAnlegen(Teams teamsIst)
         {
+            var xx = (from ss in this where ss.DisplayName == "FS20B" select ss).ToList();
+
+
             foreach (var ts in this)
             {
+                if (ts.DisplayName == "FS20B")
+                {
+                    string a = "";
+                }
+
                 var identity = (from t in teamsIst where t.DisplayName == ts.DisplayName select t.TeamId).ToList();
                 
                 // Für jedes Team, das den Namen der Klasse trägt, werden die Member eingefügt.
 
                 foreach (var teamId in identity)
                 {
+                    // Wenn das TeamIst mehrfach mit diesem Namen vorkommt, muss für beide geprüft werden.
+
+                    var ti = (from t in teamsIst where t.DisplayName == ts.DisplayName select t).ToList();
+
                     foreach (var item in ts.Members)
                     {
-                        // Jeder Member, der im Soll aber nicht im Ist existiert, wird angelegt
-
-                        if (!(from o in teamsIst where o.DisplayName == ts.DisplayName where o.Members.Contains(item) select o).Any())
+                        foreach (var t in ti)
                         {
-                            Console.WriteLine("[+] Neuer Member : " + item.PadRight(30) + " -> " + ts.DisplayName);
-                            Global.TeamsPs1.Add(@"Write-Host '[+] Neuer Member : " + item.PadRight(30) + " -> " + ts.DisplayName + "'");
-                            Global.TeamsPs1.Add(@"Add-UnifiedGroupLinks -Identity " + teamId + " -LinkType Member -Links '" + item + "'");
+                            // Jeder Member, der im Soll aber nicht im Ist existiert, wird angelegt
+
+                            if (!t.Members.Contains(item))
+                            {
+                                Console.WriteLine("[+] Neuer Member : " + item.PadRight(30) + " -> " + ts.DisplayName);
+                                Global.TeamsPs1.Add(@"Write-Host '[+] Neuer Member : " + item.PadRight(30) + " -> " + ts.DisplayName + "'");
+                                Global.TeamsPs1.Add(@"Add-UnifiedGroupLinks -Identity " + teamId + " -LinkType Member -Links '" + item + "' -Confirm:$confirm");
+                            }
                         }
                     }
                     foreach (var item in ts.Owners)
                     {
-                        // Jeder Owner, der im Soll aber nicht im Ist existiert, wird angelegt
 
-                        if (!(from o in teamsIst where o.DisplayName == ts.DisplayName where o.Owners.Contains(item) select o.Owners.Contains(item)).Any())
+                        foreach (var t in ti)
                         {
-                            Console.WriteLine("[+] Neuer Owner  : " + item.PadRight(30) + " -> " + ts.DisplayName);
-                            Global.TeamsPs1.Add(@"Write-Host '[+] Neuer Owner  : " + item.PadRight(30) + " -> " + ts.DisplayName + "'");
-                            Global.TeamsPs1.Add(@"Add-UnifiedGroupLinks -Identity " + teamId + " -LinkType Owner  -Links '" + item + "'");
+                            // Jeder Owner, der im Soll aber nicht im Ist existiert, wird angelegt
+
+                            if (!t.Owners.Contains(item))
+                            {
+                                Console.WriteLine("[+] Neuer Owner  : " + item.PadRight(30) + " -> " + ts.DisplayName);
+                                Global.TeamsPs1.Add(@"Write-Host '[+] Neuer Owner  : " + item.PadRight(30) + " -> " + ts.DisplayName + "'");
+                                Global.TeamsPs1.Add(@"Add-UnifiedGroupLinks -Identity " + teamId + " -LinkType Owner  -Links '" + item + "' -Confirm:$confirm");
+                            }
                         }
                     }                    
                 }                
@@ -232,7 +260,7 @@ namespace teams
 
                 // Lehrer zur Office365-Gruppe hinzufügen
 
-                File.AppendAllText(Global.TeamsPs,@"Add-UnifiedGroupLinks -Identity 'Kollegium' -LinkType Members -Links '" + lehrer.Mail + "'");
+                File.AppendAllLines(Global.TeamsPs, new List<string>() { "", @"Add-UnifiedGroupLinks -Identity 'Kollegium' -LinkType Members -Links '" + lehrer.Mail + "'" });
             }
 
             this.Add(new Team("Kollegium", kollegium));

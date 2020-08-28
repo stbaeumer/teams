@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.OleDb;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace teams
 {
@@ -50,7 +51,7 @@ WHERE (((SCHOOLYEAR_ID)= " + aktSj + ") AND  ((TERM_ID)=" + periodes.Count + ") 
                     };
 
                     Console.WriteLine(("Lehrer*innen " + ".".PadRight(this.Count / 150, '.')).PadRight(48, '.') + (" " + this.Count).ToString().PadLeft(4), '.');
-                    File.AppendAllText(Global.TeamsPs, "<# Anzahl Lehrer*innen : " + this.Count + " #>");
+                    File.AppendAllLines(Global.TeamsPs, new List<string>() { "<# Anzahl Lehrer*innen : " + this.Count + "" }, Encoding.UTF8);
 
                     oleDbDataReader.Close();
                 }

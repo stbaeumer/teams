@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data.OleDb;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace teams
 {
@@ -219,7 +220,6 @@ WHERE (((SCHOOLYEAR_ID)= " + aktSj + ") AND ((TERM_ID)=" + periode + ") AND ((Le
                                         }
                                         catch (Exception ex)
                                         {
-
                                             throw;
                                         }
                                     }
@@ -228,7 +228,7 @@ WHERE (((SCHOOLYEAR_ID)= " + aktSj + ") AND ((TERM_ID)=" + periode + ") AND ((Le
                         }
                     }
                     Console.WriteLine(("Unterrichte " + ".".PadRight(this.Count / 150, '.')).PadRight(48, '.') + (" " + this.Count).ToString().PadLeft(4), '.');
-                    File.AppendAllText(Global.TeamsPs, "<# Anzahl Unterrichte : " + this.Count + " #>");
+                    File.AppendAllLines(Global.TeamsPs, new List<string>() { "<# Anzahl Unterrichte : " + this.Count + "" }, Encoding.UTF8);
 
                     oleDbDataReader.Close();
                 }

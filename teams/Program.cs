@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Text;
 
 namespace teams
 {
@@ -18,8 +19,8 @@ namespace teams
                 Global.TeamsPs = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal) + @"\\Teams.ps1";
                 Global.GruppenMemberPs = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal) + @"\\GruppenOwnerMembers.csv";
 
-                File.WriteAllText(Global.TeamsPs, "<# Skript zum tagesaktuellen Abgleich der Klassen aus Atlantis / Untis mit Office 365 #>");
-                File.AppendAllText(Global.TeamsPs, "<# " + DateTime.Now.Date.ToShortDateString() + " " + DateTime.Now.ToShortTimeString()  + " #>");
+                File.WriteAllText(Global.TeamsPs, "<# Skript zum tagesaktuellen Abgleich der Klassen ä aus Atlantis / Untis mit Office 365 #>", Encoding.UTF8);
+                File.AppendAllLines(Global.TeamsPs, new List<string>() { "<# " + DateTime.Now.Date.ToShortDateString() + " " + DateTime.Now.ToShortTimeString() + "" }, Encoding.UTF8);
                 Global.TeamsPs1 = new List<string>();
                 aktSj.Add((DateTime.Now.Month >= 8 ? DateTime.Now.Year : DateTime.Now.Year - 1).ToString());
                 aktSj.Add((DateTime.Now.Month >= 8 ? DateTime.Now.Year + 1 : DateTime.Now.Year).ToString());
@@ -32,22 +33,6 @@ namespace teams
                 Lehrers lehrers = new Lehrers(aktSj[0] + aktSj[1], connectionString, periodes);
                 Klasses klasses = new Klasses(aktSj[0] + aktSj[1], lehrers, connectionString, periode);
 
-                if (!File.Exists(Global.TeamsPs))
-                {
-                    File.Create(Global.TeamsPs);
-                    File.Create(Global.GruppenMemberPs);
-                }
-
-                try
-                {
-                    File.AppendAllText(Global.TeamsPs, Global.Auth());
-                    File.AppendAllText(Global.TeamsPs, Global.GruppenAuslesen());
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception(" Die Datei Teams.ps1 ist von einem anderen Prozess gesperrt.\n\n" + ex);                    
-                }
-
                 Teams teamsIst = new Teams(Global.GruppenMemberPs, klasses);
 
                 Schuelers schuelers = new Schuelers(klasses, aktSj[0] + aktSj[1]);
@@ -58,6 +43,24 @@ namespace teams
 
                 Teams klassenTeamsSoll = new Teams(klasses, lehrers, schuelers, unterrichts);
 
+                if (!File.Exists(Global.TeamsPs))
+                {
+                    File.Create(Global.TeamsPs);
+                    File.Create(Global.GruppenMemberPs);
+                }
+
+                try
+                {
+                    File.AppendAllLines(Global.TeamsPs, new List<string>() { "", "$confirm = true" }, Encoding.UTF8);
+                    File.AppendAllText(Global.TeamsPs, Global.Auth(), Encoding.UTF8);
+                    File.AppendAllText(Global.TeamsPs, Global.GruppenAuslesen(), Encoding.UTF8);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(" Die Datei Teams.ps1 ist von einem anderen Prozess gesperrt.\n\n" + ex);                    
+                }
+
+                
                 //klassenTeamsSoll.FehlendeKlassenAnlegen(teamsIst);
 
                 teamsIst.DoppelteKlassenFinden();
@@ -68,9 +71,9 @@ namespace teams
 
                 
                 Global.TeamsPs1.Add("Write-Host 'Ende der Verarbeitung'");
-                File.AppendAllLines(Global.TeamsPs, Global.TeamsPs1);
+                File.AppendAllLines(Global.TeamsPs, Global.TeamsPs1, Encoding.UTF8);
 
-                Process.Start("powershell_ise.exe");
+                //Process.Start("powershell_ise.exe");
 
                 Console.WriteLine("Verarbeitung beendet");
             }
@@ -81,6 +84,7 @@ namespace teams
             }
             finally
             {
+                Console.ReadKey();
                 Environment.Exit(0);                
             }
         }
