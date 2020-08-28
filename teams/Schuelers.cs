@@ -423,7 +423,7 @@ ORDER BY ausgetreten DESC, klasse, schueler.name_1, schueler.name_2", connection
                     }
                 }
                 
-                var cc = (from k in atlantisschulers where k.Id == 153630 select k).ToList();
+                var cc = (from k in atlantisschulers where k.Status == "A" where k.Austrittsdatum > new DateTime(2020,08,10) where k.Austrittsdatum < DateTime.Now select k).ToList();
 
                 Console.WriteLine("Ausgetretene Schülerinnen und Schüler, deren Status 'aktiv' ist.");
 
