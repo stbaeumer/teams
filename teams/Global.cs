@@ -85,7 +85,7 @@ if ( ([System.Io.fileinfo]'C:\users\bm\Documents\GruppenOwnerMembers.csv').LastW
 $testSession = Get-PSSession
 if(-not($testSession))
 {
-    Write-Warning '$targetComputer inaccessible!'
+    Write-Warning '$targetComputer : Nicht angemeldet!'
     $cred = Get-Credential
     $session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri https://outlook.office365.com/powershell-liveid/ -Credential $cred -Authentication Basic -AllowRedirection
     Import-PSSession $session
@@ -94,7 +94,7 @@ if(-not($testSession))
 }
 else
 {
-    Write-Host 'Great! $targetComputer is accessible!'    
+    Write-Host '$targetComputer: Angemeldet!'    
 }";
 
 
