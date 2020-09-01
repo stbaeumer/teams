@@ -49,7 +49,7 @@ namespace teams
                 this.Add(klassenteamSoll);
             }
 
-            Console.WriteLine("Insgesamt müssen " + this.Count + " Klassengruppen im Office365 angelegt sein.");
+            Console.WriteLine("Insgesamt müssen " + this.Count + " Klassengruppen im Office365 angelegt sein. #>");
             File.AppendAllLines(Global.TeamsPs, new List<string>() { "<# Insgesamt müssen " + this.Count + " Klassengruppen im Office365 angelegt sein." }, Encoding.UTF8);
         }
 
@@ -130,7 +130,7 @@ namespace teams
             }
         }
 
-        internal void OwnerUndMemberLöschen(Teams klassenTeamsSoll)
+        internal void OwnerUndMemberLöschen(Teams klassenTeamsSoll, Lehrers lehrers)
         {
             foreach (var ts in this)
             {
@@ -138,13 +138,23 @@ namespace teams
                 {
                     if (!item.Contains("verena.baumeister@b"))
                     {
-                        // Jeder Owner, der im Ist aber nicht im Soll existiert, wird gelöscht
+                        // Nur Lehrer werden gelöscht
 
-                        if (!(from o in klassenTeamsSoll where o.DisplayName == ts.DisplayName where o.Owners.Contains(item) select o.Owners.Contains(item)).Any())
+                        if ((from l in lehrers where l.Mail == item select l).Any())
                         {
-                            Console.WriteLine("[-] Owner  entfernen:" + item.PadRight(30) + " aus " + ts.DisplayName);
-                            Global.TeamsPs1.Add(@"Write-Host '[-] Owner  entfernen: " + item.PadRight(30) + " aus " + ts.DisplayName + "'");
-                            Global.TeamsPs1.Add(@"Remove-UnifiedGroupLinks -Identity " + ts.TeamId + " -LinkType Owner -Links '" + item + "' -Confirm:$confirm"); // -Confirm:$false
+                            // Jeder Owner, der im Ist aber nicht im Soll existiert, wird gelöscht
+
+                            if (!(from o in klassenTeamsSoll where o.DisplayName == ts.DisplayName where o.Owners.Contains(item) select o.Owners.Contains(item)).Any())
+                            {
+                                // Referendare werden nicht gelöscht.
+
+                                if (!(from l in lehrers where item == l.Mail where l.Kürzel.StartsWith("Y") select l).Any())
+                                {
+                                    Console.WriteLine("[-] Owner  entfernen:" + item.PadRight(30) + " aus " + ts.DisplayName);
+                                    Global.TeamsPs1.Add(@"Write-Host '[-] Owner  entfernen: " + item.PadRight(30) + " aus " + ts.DisplayName + "'");
+                                    Global.TeamsPs1.Add(@"Remove-UnifiedGroupLinks -Identity " + ts.TeamId + " -LinkType Owner -Links '" + item + "' -Confirm:$confirm"); // -Confirm:$false
+                                }
+                            }
                         }
                     }                    
                 }
@@ -161,9 +171,19 @@ namespace teams
 
                             if (!(from o in klassenTeamsSoll where o.DisplayName == ts.DisplayName where o.Members.Contains(item) select o).Any())
                             {
-                                Console.WriteLine("[-] Member entfernen:" + item.PadRight(30) + " aus " + ts.DisplayName);
-                                Global.TeamsPs1.Add(@"Write-Host '[-] Member entfernen: " + item.PadRight(30) + " aus " + ts.DisplayName + "'");
-                                Global.TeamsPs1.Add(@"Remove-UnifiedGroupLinks -Identity " + ts.TeamId + " -LinkType Member  -Links '" + item + "' -Confirm:$confirm");
+                                // Nur Lehrer werden gelöscht
+
+                                if ((from l in lehrers where l.Mail == item select l).Any())
+                                {
+                                    // Referendare werden nicht gelöscht.
+
+                                    if (!(from l in lehrers where item == l.Mail where l.Kürzel.StartsWith("Y") select l).Any())
+                                    {
+                                        Console.WriteLine("[-] Member entfernen:" + item.PadRight(30) + " aus " + ts.DisplayName);
+                                        Global.TeamsPs1.Add(@"Write-Host '[-] Member entfernen: " + item.PadRight(30) + " aus " + ts.DisplayName + "'");
+                                        Global.TeamsPs1.Add(@"Remove-UnifiedGroupLinks -Identity " + ts.TeamId + " -LinkType Member  -Links '" + item + "' -Confirm:$confirm");
+                                    }
+                                }
                             }
                         }
                     }
