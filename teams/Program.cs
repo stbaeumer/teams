@@ -67,7 +67,7 @@ namespace teams
 
                 klassenTeamsSoll.OwnerUndMemberAnlegen(teamsIst);
 
-                teamsIst.OwnerUndMemberLöschen(klassenTeamsSoll);
+                teamsIst.OwnerUndMemberLöschen(klassenTeamsSoll, lehrers);
                                 
                 Global.TeamsPs1.Add("Write-Host 'Ende der Verarbeitung'");
                 File.AppendAllLines(Global.TeamsPs, Global.TeamsPs1, Encoding.UTF8);
