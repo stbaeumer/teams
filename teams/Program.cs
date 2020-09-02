@@ -19,9 +19,9 @@ namespace teams
                 Global.TeamsPs = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal) + @"\\Teams.ps1";
                 Global.GruppenMemberPs = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal) + @"\\GruppenOwnerMembers.csv";
 
-                File.WriteAllText(Global.TeamsPs, @"<# Skript zum tagesaktuellen Abgleich der Klassen aus Atlantis / Untis mit Office 365
+                File.WriteAllText(Global.TeamsPs, @"# Skript zum tagesaktuellen Abgleich der Klassen aus Atlantis / Untis mit Office 365
 ", Encoding.UTF8);
-                File.AppendAllLines(Global.TeamsPs, new List<string>() { "<# " + DateTime.Now.Date.ToShortDateString() + " " + DateTime.Now.ToShortTimeString() + "" }, Encoding.UTF8);
+                File.AppendAllLines(Global.TeamsPs, new List<string>() { "# " + DateTime.Now.Date.ToShortDateString() + " " + DateTime.Now.ToShortTimeString() + "" }, Encoding.UTF8);
                 Global.TeamsPs1 = new List<string>();
                 aktSj.Add((DateTime.Now.Month >= 8 ? DateTime.Now.Year : DateTime.Now.Year - 1).ToString());
                 aktSj.Add((DateTime.Now.Month >= 8 ? DateTime.Now.Year + 1 : DateTime.Now.Year).ToString());

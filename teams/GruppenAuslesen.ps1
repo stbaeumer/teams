@@ -1,4 +1,4 @@
-﻿<#
+﻿#
 .SYNOPSIS
   Example script to export Office 365 Groups with Members and Owners to CSV
 .DESCRIPTION

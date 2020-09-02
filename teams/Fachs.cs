@@ -39,7 +39,7 @@ WHERE Subjects.Schoolyear_id = " + aktSj + " AND Subjects.Deleted=No  AND ((Subj
                     };
 
                     Console.WriteLine(("Fächer " + ".".PadRight(this.Count / 150, '.')).PadRight(48, '.') + (" " + this.Count).ToString().PadLeft(4), '.');
-                    File.AppendAllLines(Global.TeamsPs, new List<string>() { "<# Anzahl Fächer : " + this.Count + "" }, Encoding.UTF8);
+                    File.AppendAllLines(Global.TeamsPs, new List<string>() { "# Anzahl Fächer : " + this.Count + "" }, Encoding.UTF8);
 
                     oleDbDataReader.Close();
                 }

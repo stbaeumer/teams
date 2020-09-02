@@ -50,7 +50,7 @@ namespace teams
             }
 
             Console.WriteLine("Insgesamt müssen " + this.Count + " Klassengruppen im Office365 angelegt sein. #>");
-            File.AppendAllLines(Global.TeamsPs, new List<string>() { "<# Insgesamt müssen " + this.Count + " Klassengruppen im Office365 angelegt sein." }, Encoding.UTF8);
+            File.AppendAllLines(Global.TeamsPs, new List<string>() { "# Insgesamt müssen " + this.Count + " Klassengruppen im Office365 angelegt sein." }, Encoding.UTF8);
         }
 
         public Teams(string pfad, Klasses klasses)
@@ -98,7 +98,7 @@ namespace teams
                 }
             }
             Console.WriteLine("Insgesamt " + this.Count + " Klassengruppen in Office365 vorhanden.");
-            File.AppendAllLines(Global.TeamsPs, new List<string>() { "<# Insgesamt " + this.Count + " Klassengruppen in Office365 vorhanden." });
+            File.AppendAllLines(Global.TeamsPs, new List<string>() { "# Insgesamt " + this.Count + " Klassengruppen in Office365 vorhanden." });
 
             if (this.Count < 100)
             {

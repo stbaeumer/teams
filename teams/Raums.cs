@@ -43,7 +43,7 @@ namespace teams
                     };
 
                     Console.WriteLine(("Räume " + ".".PadRight(this.Count / 150, '.')).PadRight(48, '.') + (" " + this.Count).ToString().PadLeft(4), '.');
-                    File.AppendAllLines(Global.TeamsPs, new List<string>() { "<# Anzahl Räume : " + this.Count + "" }, Encoding.UTF8);
+                    File.AppendAllLines(Global.TeamsPs, new List<string>() { "# Anzahl Räume : " + this.Count + "" }, Encoding.UTF8);
 
                     oleDbDataReader.Close();
 

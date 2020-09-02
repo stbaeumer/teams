@@ -69,7 +69,7 @@ WHERE (((Terms.SCHOOLYEAR_ID)= " + aktSj + ")  AND ((Terms.SCHOOL_ID)=177659)) O
                     else
                     {
                         Console.WriteLine(" Aktuelle Periode: " + this.AktuellePeriode);
-                        File.AppendAllLines(Global.TeamsPs, new List<string>() { "<# Aktuelle Periode: " + this.AktuellePeriode + "" }, Encoding.UTF8);
+                        File.AppendAllLines(Global.TeamsPs, new List<string>() { "# Aktuelle Periode: " + this.AktuellePeriode + "" }, Encoding.UTF8);
                     }
 
                     Console.WriteLine("");

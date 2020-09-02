@@ -136,7 +136,7 @@ WHERE (((SCHOOLYEAR_ID)= " + aktSj + ") AND ((LessonGroup.SCHOOL_ID)=177659)) OR
                     };
                     oleDbDataReader.Close();
                     Console.WriteLine("");
-                    File.AppendAllLines(Global.TeamsPs, new List<string>() { "<# Anzahl Unterrichtsgruppen : " + this.Count + "" }, Encoding.UTF8);
+                    File.AppendAllLines(Global.TeamsPs, new List<string>() { "# Anzahl Unterrichtsgruppen : " + this.Count + "" }, Encoding.UTF8);
 
                 }
                 catch (Exception ex)
