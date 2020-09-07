@@ -386,6 +386,7 @@ ORDER BY ausgetreten DESC, klasse, schueler.name_1, schueler.name_2", connection
                        
                         schueler.Nachname = theRow["Nachname"] == null ? "" : theRow["Nachname"].ToString();
                         schueler.Vorname = theRow["Vorname"] == null ? "" : theRow["Vorname"].ToString();
+                        schueler.Ort = theRow["Ort"] == null ? "" : theRow["Ort"].ToString();
                         schueler.Klasse = theRow["Klasse"] == null ? "" : theRow["Klasse"].ToString();
                         schueler.Gebdat = theRow["Gebdat"].ToString().Length < 3 ? new DateTime() : DateTime.ParseExact(theRow["Gebdat"].ToString(), "dd.MM.yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
                         schueler.Telefon = theRow["telefon"] == null ? "" : theRow["telefon"].ToString();
@@ -422,7 +423,11 @@ ORDER BY ausgetreten DESC, klasse, schueler.name_1, schueler.name_2", connection
                         }
                     }
                 }
-                
+
+                var zz = (from s in atlantisschulers where s.Ort == "Heiden" select s).ToList();
+
+                var scc = zz.Count();
+
                 var cc = (from k in atlantisschulers where k.Status == "A" where k.Austrittsdatum > new DateTime(2020,08,10) where k.Austrittsdatum < DateTime.Now select k).ToList();
 
                 Console.WriteLine("Ausgetretene Schülerinnen und Schüler, deren Status 'aktiv' ist.");

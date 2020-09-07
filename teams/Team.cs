@@ -11,12 +11,15 @@ namespace teams
         public string TeamId { get; private set; }
         public List<string> Owners { get; set; }
         public List<string> Members { get; set; }
-        public Team(string displayName, List<Schueler> schuelers, List<Lehrer> lehrers, List<Lehrer> klassenleitungen)
+        public string Kategorie { get; set; }
+
+        public Team(string displayName, List<Schueler> schuelers, List<Lehrer> lehrers, List<Lehrer> klassenleitungen, string kategorie, string x)
         {
             DisplayName = displayName;
             Schuelers = schuelers;
             Lehrers = lehrers;
             Klassenleitungen = klassenleitungen;
+            Kategorie = kategorie;
         }
 
         public Team(string displayName, List<Lehrer> kollegium)
@@ -25,12 +28,14 @@ namespace teams
             Lehrers = kollegium;
         }
 
-        public Team(string displayName, string teamId, string ownerMail, string memberMail)
+        public Team(string displayName, string teamId, string ownerMail, string memberMail, string kategorie)
         {
             Owners = new List<string>();
             Members = new List<string>();
             DisplayName = displayName;
             TeamId = teamId;
+            Kategorie = kategorie;
+
             if (ownerMail != null)
             {
                 Owners.Add(ownerMail);
@@ -42,7 +47,7 @@ namespace teams
         }
         public Team(string displayName)
         {
-            DisplayName = displayName;
+            this.DisplayName = displayName;
             Owners = new List<string>();
             Members = new List<string>();            
         }

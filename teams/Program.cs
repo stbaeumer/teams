@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace teams
@@ -29,9 +30,10 @@ namespace teams
                 const string connectionString = @"Provider = Microsoft.Jet.OLEDB.4.0; Data Source=M:\\Data\\gpUntis.mdb;";
 
                 Periodes periodes = new Periodes(aktSj[0] + aktSj[1], connectionString);
-                var periode = periodes.Count;
 
-                Lehrers lehrers = new Lehrers(aktSj[0] + aktSj[1], connectionString, periodes);
+                var periode = (from p in periodes where p.Bis >= DateTime.Now where DateTime.Now.Date >= p.Von select p.IdUntis).FirstOrDefault();
+
+                Lehrers lehrers = new Lehrers(aktSj[0] + aktSj[1], connectionString, periode);
                 Klasses klasses = new Klasses(aktSj[0] + aktSj[1], lehrers, connectionString, periode);
 
                 Teams teamsIst = new Teams(Global.GruppenMemberPs, klasses);
@@ -42,7 +44,7 @@ namespace teams
                 Unterrichtsgruppes unterrichtsgruppes = new Unterrichtsgruppes(aktSj[0] + aktSj[1], connectionString);
                 Unterrichts unterrichts = new Unterrichts(aktSj[0] + aktSj[1], datumMontagDerKalenderwoche, connectionString, periode, klasses, lehrers, fachs, raums, unterrichtsgruppes);
 
-                Teams klassenTeamsSoll = new Teams(klasses, lehrers, schuelers, unterrichts);
+                Teams teamsSoll = new Teams(klasses, lehrers, schuelers, unterrichts);
 
                 if (!File.Exists(Global.TeamsPs))
                 {
@@ -65,15 +67,14 @@ namespace teams
 
                 teamsIst.DoppelteKlassenFinden();
 
-                klassenTeamsSoll.OwnerUndMemberAnlegen(teamsIst);
+                teamsSoll.OwnerUndMemberAnlegen(teamsIst);
 
-                teamsIst.OwnerUndMemberLöschen(klassenTeamsSoll, lehrers);
+                teamsIst.OwnerUndMemberLöschen(teamsSoll, lehrers);
                                 
-                Global.TeamsPs1.Add("Write-Host 'Ende der Verarbeitung'");
+                Global.TeamsPs1.Add("    Write-Host 'Ende der Verarbeitung'");
                 File.AppendAllLines(Global.TeamsPs, Global.TeamsPs1, Encoding.UTF8);
-
-                //Process.Start("powershell_ise.exe");
-
+                File.AppendAllText(Global.TeamsPs, Global.Ende(), Encoding.UTF8);
+                
                 Console.WriteLine("Verarbeitung beendet");
             }
             catch (Exception ex)

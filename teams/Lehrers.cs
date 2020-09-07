@@ -13,7 +13,7 @@ namespace teams
         {
         }
 
-        public Lehrers(string aktSj, string connectionString, Periodes periodes)
+        public Lehrers(string aktSj, string connectionString, int periode)
         {
             using (OleDbConnection oleDbConnection = new OleDbConnection(connectionString))
             {
@@ -27,7 +27,7 @@ Teacher.FirstName,
 Teacher.Email,
 Teacher.PlannedWeek
 FROM Teacher 
-WHERE (((SCHOOLYEAR_ID)= " + aktSj + ") AND  ((TERM_ID)=" + periodes.Count + ") AND ((Teacher.SCHOOL_ID)=177659) AND (((Teacher.Deleted)=No))) ORDER BY Teacher.Name;";
+WHERE (((SCHOOLYEAR_ID)= " + aktSj + ") AND  ((TERM_ID)=" + periode + ") AND ((Teacher.SCHOOL_ID)=177659) AND (((Teacher.Deleted)=No))) ORDER BY Teacher.Name;";
 
                     OleDbCommand oleDbCommand = new OleDbCommand(queryString, oleDbConnection);
                     oleDbConnection.Open();

@@ -25,12 +25,40 @@ namespace teams
         {
             return @"
 
-if ( ([System.Io.fileinfo]'C:\users\bm\Documents\GruppenOwnerMembers.csv').LastWriteTime.Date -ge [datetime]::Today ){     
-# if ( $FALSE ){     
-     'Die Datei C:\users\bm\Documents\GruppenOwnerMembers.csv muss nicht aktualisiert werden.'
+if (([System.Io.fileinfo]'C:\users\bm\Documents\GruppenOwnerMembers.csv').LastWriteTime.Date -ge [datetime]::Today){     
+
+";
+        }
+
+        internal static string Auth()
+        {
+            return @"
+$testSession = Get-PSSession
+if(-not($testSession))
+{
+    Write-Warning '$targetComputer : Nicht angemeldet!'
+    $cred = Get-Credential
+    $session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri https://outlook.office365.com/powershell-liveid/ -Credential $cred -Authentication Basic -AllowRedirection
+    Import-PSSession $session
+    Connect-AzureAD -Credential $cred
+    Connect-MicrosoftTeams -Credential $cred
+}
+else
+{
+    Write-Host '$targetComputer: Angemeldet!'    
+}";
+
+
+        }
+
+        internal static string Ende()
+        {
+            return
+                @"     
 }else{
 
-    Write-Host -ForegroundColor Green 'Loading all Office 365 Groups'
+    $OutputEncoding = [ System.Text.Encoding]::UTF8   
+    Write-Host -ForegroundColor Green 'Alle Office 365-Gruppen werden geladen'
     $Groups = Get-UnifiedGroup -ResultSize Unlimited  | Sort-Object DisplayName
 
     # Process Groups
@@ -71,33 +99,10 @@ if ( ([System.Io.fileinfo]'C:\users\bm\Documents\GruppenOwnerMembers.csv').LastW
 
     # Export to CSV
     Write-Host -ForegroundColor Green 'GruppenOwnerMembers.csv wird geschrieben'
-    $results | Export-Csv -NoTypeInformation -Path C:\users\bm\Documents\GruppenOwnerMembers.csv
+    $results | Export-Csv -NoTypeInformation -Path C:\users\bm\Documents\GruppenOwnerMembers.csv -Encoding UTF8
     start notepad++ C:\users\bm\Documents\GruppenOwnerMembers.csv    
 }
-
 ";
-        }
-
-        internal static string Auth()
-        {
-            return @"
-
-$testSession = Get-PSSession
-if(-not($testSession))
-{
-    Write-Warning '$targetComputer : Nicht angemeldet!'
-    $cred = Get-Credential
-    $session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri https://outlook.office365.com/powershell-liveid/ -Credential $cred -Authentication Basic -AllowRedirection
-    Import-PSSession $session
-    Connect-AzureAD -Credential $cred
-    Connect-MicrosoftTeams -Credential $cred
-}
-else
-{
-    Write-Host '$targetComputer: Angemeldet!'    
-}";
-
-
         }
     }
 }
