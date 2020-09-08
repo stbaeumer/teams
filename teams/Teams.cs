@@ -42,10 +42,6 @@ namespace teams
         {
             foreach (var klasse in (from k in klasses where (k.Klassenleitungen != null && k.Klassenleitungen.Count > 0 && k.Klassenleitungen[0] != null) select k))
             {
-                if (klasse.NameUntis == "FS20B")
-                {
-                    string a = "";
-                }
                 Team klassenteamSoll = new Team(klasse.NameUntis);
 
                 var o = (from l in lehrers
@@ -95,13 +91,14 @@ namespace teams
                 {
                     List<string> zeile = new List<string>();
 
-                    zeile.AddRange(currentLine.Split(','));
+                    zeile.AddRange(currentLine.Replace("\"", "").Replace("\\", "").Split('|'));
 
-                    if (zeile.Count != 5)
+                    if (zeile.Count != 4)
                     {
-                        Console.WriteLine("Fehler in der Datei " + pfad + ". Die Spaltenzahl weicht ab!");
+                        Console.WriteLine("Fehler in der Datei " + pfad + ". Falsche Spaltenzahl.");
                         Console.ReadKey();
                     }
+
                     // Prüfe, ob es ein Klassenteam ist
 
                     if ((from k in klasses where k.NameUntis == zeile[1] select k).Any())
