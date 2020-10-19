@@ -45,6 +45,7 @@ namespace teams
                 Members.Add(memberMail);
             }            
         }
+
         public Team(string displayName)
         {
             this.DisplayName = displayName;

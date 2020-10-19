@@ -56,7 +56,7 @@ namespace teams
                 {
                     File.AppendAllLines(Global.TeamsPs, new List<string>() { "", "$confirm = $true" }, Encoding.UTF8);
                     File.AppendAllText(Global.TeamsPs, Global.Auth(), Encoding.UTF8);
-                    File.AppendAllText(Global.TeamsPs, Global.GruppenAuslesen(), Encoding.UTF8);
+                    File.AppendAllText(Global.TeamsPs, Global.GruppenAuslesen(teamsIst.Count), Encoding.UTF8);
                 }
                 catch (Exception ex)
                 {

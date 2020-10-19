@@ -21,12 +21,12 @@ namespace teams
             return string.Empty;
         }
 
-        internal static string GruppenAuslesen()
+        internal static string GruppenAuslesen(int anzahlTeamsIst)
         {
             return @"
 
-if (([System.Io.fileinfo]'C:\users\bm\Documents\GruppenOwnerMembers.csv').LastWriteTime.Date -ge [datetime]::Today){     
-
+if ((([System.Io.fileinfo]'C:\users\bm\Documents\GruppenOwnerMembers.csv').LastWriteTime.Date -ge [datetime]::Today) -and ("+ anzahlTeamsIst + @" -gt 100)){     
+    
 ";
         }
 
@@ -57,7 +57,7 @@ else
                 @"     
 }else{
 
-    $OutputEncoding = [ System.Text.Encoding]::UTF8   
+    
     Write-Host -ForegroundColor Green 'Alle Office 365-Gruppen werden geladen'
     $Groups = Get-UnifiedGroup -ResultSize Unlimited  | Sort-Object DisplayName
 
@@ -99,7 +99,7 @@ else
 
     # Export to CSV
     Write-Host -ForegroundColor Green 'GruppenOwnerMembers.csv wird geschrieben'
-    $results | Export-Csv -NoTypeInformation -Path C:\users\bm\Documents\GruppenOwnerMembers.csv -Encoding UTF8
+    $results | Export-Csv -NoTypeInformation -Path C:\users\bm\Documents\GruppenOwnerMembers.csv -Encoding UTF8 -Delimiter '|'
     start notepad++ C:\users\bm\Documents\GruppenOwnerMembers.csv    
 }
 ";

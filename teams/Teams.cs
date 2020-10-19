@@ -128,7 +128,7 @@ namespace teams
 
             if (this.Count < 100)
             {
-                throw new Exception("Die Anzahl der existierenden Teams ist zu niedrig.");                
+                //throw new Exception("Die Anzahl der existierenden Teams ist zu niedrig.");                
             }
         }
 
