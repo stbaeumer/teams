@@ -15,6 +15,8 @@ namespace teams
 
         public Lehrers(string aktSj, string connectionString, int periode)
         {
+            Anrechnungs anrechnungen = new Anrechnungs(aktSj, connectionString, periode);
+
             using (OleDbConnection oleDbConnection = new OleDbConnection(connectionString))
             {
                 try
@@ -25,7 +27,8 @@ Teacher.Name,
 Teacher.Longname, 
 Teacher.FirstName,
 Teacher.Email,
-Teacher.PlannedWeek
+Teacher.PlannedWeek,
+Teacher.Flags
 FROM Teacher 
 WHERE (((SCHOOLYEAR_ID)= " + aktSj + ") AND  ((TERM_ID)=" + periode + ") AND ((Teacher.SCHOOL_ID)=177659) AND (((Teacher.Deleted)=No))) ORDER BY Teacher.Name;";
 
@@ -39,7 +42,10 @@ WHERE (((SCHOOLYEAR_ID)= " + aktSj + ") AND  ((TERM_ID)=" + periode + ") AND ((T
                         {
                             IdUntis = oleDbDataReader.GetInt32(0),
                             Kürzel = Global.SafeGetString(oleDbDataReader, 1),
-                            Mail = Global.SafeGetString(oleDbDataReader, 4)
+                            Mail = Global.SafeGetString(oleDbDataReader, 4),
+                            Deputat = Convert.ToDouble(oleDbDataReader.GetInt32(5)) / 1000,
+                            Geschlecht = Global.SafeGetString(oleDbDataReader, 6) == "W" ? "w" : "m",
+                            Anrechnungen = (from a in anrechnungen where a.TeacherIdUntis == oleDbDataReader.GetInt32(0) select a).ToList()
                         };
 
                         if (lehrer.Mail.Contains("ertrud"))
@@ -47,11 +53,14 @@ WHERE (((SCHOOLYEAR_ID)= " + aktSj + ") AND  ((TERM_ID)=" + periode + ") AND ((T
                             lehrer.Mail = lehrer.Mail.Replace("ertrud", "erti");
                         }
 
-                        this.Add(lehrer);
+                        if (lehrer.Deputat > 0 && lehrer.Mail != null && lehrer.Mail != "")
+                        {
+                            this.Add(lehrer);
+                        }                        
                     };
 
                     Console.WriteLine(("Lehrer*innen " + ".".PadRight(this.Count / 150, '.')).PadRight(48, '.') + (" " + this.Count).ToString().PadLeft(4), '.');
-                    File.AppendAllLines(Global.TeamsPs, new List<string>() { "# Anzahl Lehrer*innen : " + this.Count + "" }, Encoding.UTF8);
+                    File.AppendAllLines(Global.TeamsPs, new List<string>() { "# Anzahl Lehrer*innen in Untis : " + this.Count + "" }, Encoding.UTF8);
 
                     oleDbDataReader.Close();
                 }

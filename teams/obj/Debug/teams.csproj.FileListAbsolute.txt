@@ -1,6 +1,7 @@
-U:\Source\Repos\teams\teams\obj\Debug\teams.csprojResolveAssemblyReference.cache
 U:\Source\Repos\teams\teams\bin\Debug\teams.exe.config
 U:\Source\Repos\teams\teams\bin\Debug\teams.exe
 U:\Source\Repos\teams\teams\bin\Debug\teams.pdb
 U:\Source\Repos\teams\teams\obj\Debug\teams.exe
 U:\Source\Repos\teams\teams\obj\Debug\teams.pdb
+U:\Source\Repos\teams\teams\obj\Debug\teams.csprojAssemblyReference.cache
+U:\Source\Repos\teams\teams\obj\Debug\teams.csproj.CoreCompileInputs.cache

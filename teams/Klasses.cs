@@ -50,7 +50,7 @@ FROM Class LEFT JOIN Teacher ON Class.TEACHER_ID = Teacher.TEACHER_ID WHERE (((C
                     };
 
                     Console.WriteLine(("Klassen " + ".".PadRight(this.Count / 150, '.')).PadRight(48, '.') + (" " + this.Count).ToString().PadLeft(4), '.');
-                    File.AppendAllLines(Global.TeamsPs, new List<string>() { "# Anzahl Klassen : " + this.Count + "" });
+                    File.AppendAllLines(Global.TeamsPs, new List<string>() { "# Anzahl Klassen in Untis: " + this.Count + "" });
 
                     oleDbDataReader.Close();
 

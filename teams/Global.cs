@@ -25,8 +25,12 @@ namespace teams
         {
             return @"
 
-if ((([System.Io.fileinfo]'C:\users\bm\Documents\GruppenOwnerMembers.csv').LastWriteTime.Date -ge [datetime]::Today) -and ("+ anzahlTeamsIst + @" -gt 100)){     
+if ((([System.Io.fileinfo]'C:\users\bm\Documents\GruppenOwnerMembers.csv').LastWriteTime.Date -ge [datetime]::Today)){     
     
+    Write-Host '|'
+    Write-Host '| Da die GruppenOwnerMember.csv heute zuletzt aktualisiert wurde, wird ein Abgleich aller Gruppen mit Ownern und Membern gemacht ...'
+    Write-Host '|'
+
 ";
         }
 
@@ -36,7 +40,7 @@ if ((([System.Io.fileinfo]'C:\users\bm\Documents\GruppenOwnerMembers.csv').LastW
 $testSession = Get-PSSession
 if(-not($testSession))
 {
-    Write-Warning '$targetComputer : Nicht angemeldet!'
+    Write-Warning '$targetComputer : Sie sind Nicht angemeldet.'
     $cred = Get-Credential
     $session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri https://outlook.office365.com/powershell-liveid/ -Credential $cred -Authentication Basic -AllowRedirection
     Import-PSSession $session
@@ -45,7 +49,7 @@ if(-not($testSession))
 }
 else
 {
-    Write-Host '$targetComputer: Angemeldet!'    
+    Write-Host '$targetComputer: Sie sind angemeldet.'    
 }";
 
 
@@ -56,9 +60,10 @@ else
             return
                 @"     
 }else{
-
     
-    Write-Host -ForegroundColor Green 'Alle Office 365-Gruppen werden geladen'
+    Write-Host 'Da die GruppenOwnerMember.csv nicht von heute ist, wird sie nun erstellt. ...'
+    
+    Write-Host -ForegroundColor Green 'Alle Office 365-Gruppen werden geladen ...'
     $Groups = Get-UnifiedGroup -ResultSize Unlimited  | Sort-Object DisplayName
 
     # Process Groups
@@ -79,6 +84,7 @@ else
                 GroupDisplayName = $Group.DisplayName
                 User = $Owner.PrimarySmtpAddress
                 Role = 'Owner'
+                Type = 'O365'
             }
         }
  
@@ -93,12 +99,41 @@ else
                 GroupDisplayName = $Group.DisplayName
                 User = $Member.PrimarySmtpAddress
                 Role = 'Member'
+                Type = 'O365'
             }        
         }        
     }
 
+    Write-Host -ForegroundColor Green 'Alle Verteilergruppen werden geladen'
+    $Groups = Get-DistributionGroup -ResultSize Unlimited | Sort-Object DisplayName
+       
+
+    # Process Groups
+    
+    Write-Host -ForegroundColor Green 'Processing Groups'
+
+    $resultsV = foreach ($Group in $Groups)
+    {
+        Write-Host -ForegroundColor Magenta 'Hole alle Member der Verteilergruppe ' $Group.DisplayName  '('$Group.Identity')' ...
+            $Members = Get-DistributionGroupMember -Identity $Group.Identity -ResultSize Unlimited
+            $MembersSMTP=@()
+    
+        foreach ($Member in $Members)
+        {
+            [pscustomobject]@{
+                GroupId = $Group.Identity
+                GroupDisplayName = $Group.DisplayName
+                User = $Member.PrimarySmtpAddress
+                Role = 'Member'
+                Type = 'Distribution'
+            }        
+        }        
+    }
+
+    $results = $results + $resultsV
+
     # Export to CSV
-    Write-Host -ForegroundColor Green 'GruppenOwnerMembers.csv wird geschrieben'
+    Write-Host -ForegroundColor Green 'GruppenOwnerMembers.csv wird geschrieben. Nun kann Teams.exe erneut gestartet werden.'
     $results | Export-Csv -NoTypeInformation -Path C:\users\bm\Documents\GruppenOwnerMembers.csv -Encoding UTF8 -Delimiter '|'
     start notepad++ C:\users\bm\Documents\GruppenOwnerMembers.csv    
 }

@@ -33,8 +33,11 @@ namespace teams
 
                 var periode = (from p in periodes where p.Bis >= DateTime.Now where DateTime.Now.Date >= p.Von select p.IdUntis).FirstOrDefault();
 
-                Lehrers lehrers = new Lehrers(aktSj[0] + aktSj[1], connectionString, periode);
+                Lehrers lehrers = new Lehrers(aktSj[0] + aktSj[1], connectionString, periode);                
+                
                 Klasses klasses = new Klasses(aktSj[0] + aktSj[1], lehrers, connectionString, periode);
+
+                // Tatsächlich existierende Teams ermitteln
 
                 Teams teamsIst = new Teams(Global.GruppenMemberPs, klasses);
 
@@ -44,7 +47,41 @@ namespace teams
                 Unterrichtsgruppes unterrichtsgruppes = new Unterrichtsgruppes(aktSj[0] + aktSj[1], connectionString);
                 Unterrichts unterrichts = new Unterrichts(aktSj[0] + aktSj[1], datumMontagDerKalenderwoche, connectionString, periode, klasses, lehrers, fachs, raums, unterrichtsgruppes);
 
-                Teams teamsSoll = new Teams(klasses, lehrers, schuelers, unterrichts);
+                Teams teamsSoll = new Teams() { };
+                
+                Teams klassenteams = new Teams(klasses, lehrers, schuelers, unterrichts);
+                Teams klassenleitung = new Teams(klasses, lehrers);
+                Teams lehrerinnen = new Teams(lehrers, "Lehrerinnen");
+                Teams vollzeitkraefte = new Teams(lehrers, "Vollzeit");
+                Teams teilzeitkraefte = new Teams(lehrers, "Teilzeit");
+                Teams bildungsgänge = new Teams(klassenteams);
+
+                Team gym13LuL = new Team(klassenteams, Convert.ToInt32(aktSj[0].Substring(2,2)), "Gym13LuL");
+                Team anlageBCAbschlussklassenLuL = new Team(klassenteams, Convert.ToInt32(aktSj[0].Substring(2, 2)), "AnlageBCAbschlussklassenLuL");
+                Team blaueBriefe = new Team(klassenteams, Convert.ToInt32(aktSj[0].Substring(2, 2)), "BlaueBriefe");
+                Team bildungsgangleitungen = new Team(lehrers, "Bildungsgangleitungen");
+                Team oeffentlichkeitsarbeit = new Team(lehrers, "Oeffentlichkeitsarbeit");
+                Team praktikantenbetreuung = new Team(lehrers, "Praktikantenbetreuung");
+
+                teamsSoll.AddRange(klassenteams);
+                teamsSoll.AddRange(klassenleitung);
+                teamsSoll.AddRange(lehrerinnen);
+                teamsSoll.AddRange(vollzeitkraefte);
+                teamsSoll.AddRange(teilzeitkraefte);
+                teamsSoll.AddRange(bildungsgänge);
+                teamsSoll.Add(gym13LuL);
+                teamsSoll.Add(anlageBCAbschlussklassenLuL);
+                teamsSoll.Add(blaueBriefe);
+                teamsSoll.Add(bildungsgangleitungen);
+                teamsSoll.Add(oeffentlichkeitsarbeit);
+                teamsSoll.Add(praktikantenbetreuung);
+
+                teamsSoll.VerteilerGruppenAnlegen(teamsIst);
+                //teamsSoll.FehlendeKlassenTeamsAnlegen(teamsIst);
+
+
+                
+
 
                 if (!File.Exists(Global.TeamsPs))
                 {
@@ -62,20 +99,27 @@ namespace teams
                 {
                     throw new Exception(" Die Datei Teams.ps1 ist von einem anderen Prozess gesperrt.\n\n" + ex);                    
                 }
-                                
-                //klassenTeamsSoll.FehlendeKlassenAnlegen(teamsIst);
 
-                teamsIst.DoppelteKlassenFinden();
 
-                teamsSoll.OwnerUndMemberAnlegen(teamsIst);
 
-                teamsIst.OwnerUndMemberLöschen(teamsSoll, lehrers);
+                
+
+                teamsSoll.VerteilergruppeMemberAnlegen(teamsIst);
+                teamsIst.VerteilergruppenMemberLöschen(teamsSoll, lehrers);
+
+
+
+                /*teamsIst.DoppelteKlassenFinden();
+
+                teamsSoll.TeamOwnerUndMemberAnlegen(teamsIst);
+                teamsIst.OwnerUndMemberLöschen(teamsSoll, lehrers);*/
                                 
                 Global.TeamsPs1.Add("    Write-Host 'Ende der Verarbeitung'");
                 File.AppendAllLines(Global.TeamsPs, Global.TeamsPs1, Encoding.UTF8);
                 File.AppendAllText(Global.TeamsPs, Global.Ende(), Encoding.UTF8);
                 
-                Console.WriteLine("Verarbeitung beendet");
+                Console.WriteLine("Verarbeitung beendet.");
+                Console.WriteLine("Öffnen Sie jetzt die ISE als Administrator. Öffnen Sie in der ISE die Datei " + Global.TeamsPs + ". ");
             }
             catch (Exception ex)
             {

@@ -42,6 +42,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Anrechnung.cs" />
+    <Compile Include="Anrechnungen.cs" />
+    <Compile Include="Anrechnungsgrund.cs" />
+    <Compile Include="Anrechnungsgrunds.cs" />
     <Compile Include="Fach.cs" />
     <Compile Include="Fachs.cs" />
     <Compile Include="Global.cs" />
