@@ -8,9 +8,9 @@ namespace teams
 {
     public class Fachs : List<Fach>
     {
-        public Fachs(string aktSj, string connectionString)
+        public Fachs()
         {
-            using (OleDbConnection oleDbConnection = new OleDbConnection(connectionString))
+            using (OleDbConnection oleDbConnection = new OleDbConnection(Global.ConnectionStringUntis))
             {
                 try
                 {
@@ -21,7 +21,7 @@ Subjects.Longname,
 Subjects.Text,
 Description.Name
 FROM Description RIGHT JOIN Subjects ON Description.DESCRIPTION_ID = Subjects.DESCRIPTION_ID
-WHERE Subjects.Schoolyear_id = " + aktSj + " AND Subjects.Deleted=No  AND ((Subjects.SCHOOL_ID)=177659) ORDER BY Subjects.Name;";
+WHERE Subjects.Schoolyear_id = " + Global.AktSj[0] + Global.AktSj[1] + " AND Subjects.Deleted=No  AND ((Subjects.SCHOOL_ID)=177659) ORDER BY Subjects.Name;";
 
                     OleDbCommand oleDbCommand = new OleDbCommand(queryString, oleDbConnection);
                     oleDbConnection.Open();
@@ -38,9 +38,6 @@ WHERE Subjects.Schoolyear_id = " + aktSj + " AND Subjects.Deleted=No  AND ((Subj
                         this.Add(fach);
                     };
 
-                    Console.WriteLine(("Fächer " + ".".PadRight(this.Count / 150, '.')).PadRight(48, '.') + (" " + this.Count).ToString().PadLeft(4), '.');
-                    File.AppendAllLines(Global.TeamsPs, new List<string>() { "# Anzahl Fächer : " + this.Count + "" }, Encoding.UTF8);
-
                     oleDbDataReader.Close();
                 }
                 catch (Exception ex)
@@ -50,6 +47,7 @@ WHERE Subjects.Schoolyear_id = " + aktSj + " AND Subjects.Deleted=No  AND ((Subj
                 finally
                 {
                     oleDbConnection.Close();
+                    Global.WriteLine("Fächer", this.Count);
                 }
             }
         }

@@ -8,9 +8,9 @@ namespace teams
 {
     public class Periodes : List<Periode>
     {
-        public Periodes(string aktSj, string connectionString)
+        public Periodes()
         {
-            using (OleDbConnection oleDbConnection = new OleDbConnection(connectionString))
+            using (OleDbConnection oleDbConnection = new OleDbConnection(Global.ConnectionStringUntis))
             {
                 try
                 {
@@ -21,14 +21,11 @@ Terms.Longname,
 Terms.DateFrom, 
 Terms.DateTo
 FROM Terms
-WHERE (((Terms.SCHOOLYEAR_ID)= " + aktSj + ")  AND ((Terms.SCHOOL_ID)=177659)) ORDER BY Terms.TERM_ID;";
+WHERE (((Terms.SCHOOLYEAR_ID)= " + Global.AktSj[0] + Global.AktSj[1] + ")  AND ((Terms.SCHOOL_ID)=177659)) ORDER BY Terms.TERM_ID;";
 
                     OleDbCommand oleDbCommand = new OleDbCommand(queryString, oleDbConnection);
                     oleDbConnection.Open();
                     OleDbDataReader oleDbDataReader = oleDbCommand.ExecuteReader();
-
-                    Console.WriteLine("Perioden");
-                    Console.WriteLine("--------");
 
                     while (oleDbDataReader.Read())
                     {
@@ -44,9 +41,6 @@ WHERE (((Terms.SCHOOLYEAR_ID)= " + aktSj + ")  AND ((Terms.SCHOOL_ID)=177659)) O
                         if (DateTime.Now > periode.Von && DateTime.Now < periode.Bis)
                             this.AktuellePeriode = periode.IdUntis;
 
-                        Console.WriteLine(" " + periode.Name.ToString().PadRight(25) + " " + periode.Von.ToShortDateString() + " - " + periode.Bis.ToShortDateString());
-
-
                         this.Add(periode);
                     };
 
@@ -59,8 +53,6 @@ WHERE (((Terms.SCHOOLYEAR_ID)= " + aktSj + ")  AND ((Terms.SCHOOL_ID)=177659)) O
 
                     oleDbDataReader.Close();
 
-                    Console.WriteLine("");
-
                     if (this.AktuellePeriode == 0)
                     {
                         Console.WriteLine("Es kann keine aktuelle Periode ermittelt werden. Das ist z. B. während der Sommerferien der Fall. Es wird die Periode " + this.Count + " als aktuelle Periode angenommen.");
@@ -68,11 +60,8 @@ WHERE (((Terms.SCHOOLYEAR_ID)= " + aktSj + ")  AND ((Terms.SCHOOL_ID)=177659)) O
                     }
                     else
                     {
-                        Console.WriteLine(" Aktuelle Periode: " + this.AktuellePeriode);
-                        File.AppendAllLines(Global.TeamsPs, new List<string>() { "# Aktuelle Periode: " + this.AktuellePeriode + "" }, Encoding.UTF8);
+                        Global.WriteLine("Perioden", this.Count);
                     }
-
-                    Console.WriteLine("");
                 }
                 catch (Exception ex)
                 {

@@ -14,9 +14,12 @@ namespace teams
         {
         }
 
-        public Unterrichts(string aktSj, DateTime datumErsterTagDesPrüfZyklus, string connectionString, int periode, Klasses klasses, Lehrers lehrers, Fachs fachs, Raums raums, Unterrichtsgruppes unterrichtsgruppes)
+        public Unterrichts(int periode, Klasses klasses, Lehrers lehrers, Fachs fachs, Raums raums, Unterrichtsgruppes unterrichtsgruppes)
         {
-            using (OleDbConnection oleDbConnection = new OleDbConnection(connectionString))
+            DateTime datumMontagDerKalenderwoche = new DateTime(2020, 08, 10); //GetMondayDateOfWeek(kalenderwoche, DateTime.Now.Year);
+            DateTime datumErsterTagDesPrüfZyklus = new DateTime(2020, 08, 10);
+
+            using (OleDbConnection oleDbConnection = new OleDbConnection(Global.ConnectionStringUntis))
             {
                 int id = 0;
 
@@ -32,23 +35,17 @@ Flags,
 DateFrom,
 DateTo
 FROM LESSON
-WHERE (((SCHOOLYEAR_ID)= " + aktSj + ") AND ((TERM_ID)=" + periode + ") AND ((Lesson.SCHOOL_ID)=177659) AND (((Lesson.Deleted)=No))) ORDER BY LESSON_ID;";
+WHERE (((SCHOOLYEAR_ID)= " + Global.AktSj[0] + Global.AktSj[1] + ") AND ((TERM_ID)=" + periode + ") AND ((Lesson.SCHOOL_ID)=177659) AND (((Lesson.Deleted)=No))) ORDER BY LESSON_ID;";
 
                     OleDbCommand oleDbCommand = new OleDbCommand(queryString, oleDbConnection);
                     oleDbConnection.Open();
                     OleDbDataReader oleDbDataReader = oleDbCommand.ExecuteReader();
 
-                    Console.WriteLine("Unterrichte");
-                    Console.WriteLine("-----------");
-
+                    
                     while (oleDbDataReader.Read())
                     {
                         id = oleDbDataReader.GetInt32(0);
 
-                        if (id == 7696)
-                        {
-                            string a = "";
-                        }
                         string wannUndWo = Global.SafeGetString(oleDbDataReader, 4);
 
                         var zur = wannUndWo.Replace("~~", "|").Split('|');
@@ -216,19 +213,18 @@ WHERE (((SCHOOLYEAR_ID)= " + aktSj + ") AND ((TERM_ID)=" + periode + ") AND ((Le
                                         try
                                         {
                                             string ugg = unterrichtsgruppeDiesesUnterrichts == null ? "" : unterrichtsgruppeDiesesUnterrichts.Name;
-                                            Console.WriteLine(unterricht.Id.ToString().PadLeft(4) + " " + unterricht.LehrerKürzel.PadRight(4) + unterricht.KlasseKürzel.PadRight(20) + unterricht.FachKürzel.PadRight(10) + " Raum: " + r.PadRight(10) + " Tag: " + unterricht.Tag + " Stunde: " + unterricht.Stunde + " " + ugg.PadLeft(3));
+                                           // Console.WriteLine(unterricht.Id.ToString().PadLeft(4) + " " + unterricht.LehrerKürzel.PadRight(4) + unterricht.KlasseKürzel.PadRight(20) + unterricht.FachKürzel.PadRight(10) + " Raum: " + r.PadRight(10) + " Tag: " + unterricht.Tag + " Stunde: " + unterricht.Stunde + " " + ugg.PadLeft(3));
                                         }
                                         catch (Exception ex)
                                         {
-                                            throw;
+                                            throw ex;
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                    Console.WriteLine(("Unterrichte " + ".".PadRight(this.Count / 150, '.')).PadRight(48, '.') + (" " + this.Count).ToString().PadLeft(4), '.');
-                    File.AppendAllLines(Global.TeamsPs, new List<string>() { "# Anzahl Unterrichte : " + this.Count + "" }, Encoding.UTF8);
+                    Global.WriteLine("Unterrichte", this.Count);
 
                     oleDbDataReader.Close();
                 }

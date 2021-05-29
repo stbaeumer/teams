@@ -13,11 +13,11 @@ namespace teams
         {
         }
 
-        public Lehrers(string aktSj, string connectionString, int periode)
+        public Lehrers(int periode)
         {
-            Anrechnungs anrechnungen = new Anrechnungs(aktSj, connectionString, periode);
+            Anrechnungs anrechnungen = new Anrechnungs(periode);
 
-            using (OleDbConnection oleDbConnection = new OleDbConnection(connectionString))
+            using (OleDbConnection oleDbConnection = new OleDbConnection(Global.ConnectionStringUntis))
             {
                 try
                 {
@@ -30,7 +30,7 @@ Teacher.Email,
 Teacher.PlannedWeek,
 Teacher.Flags
 FROM Teacher 
-WHERE (((SCHOOLYEAR_ID)= " + aktSj + ") AND  ((TERM_ID)=" + periode + ") AND ((Teacher.SCHOOL_ID)=177659) AND (((Teacher.Deleted)=No))) ORDER BY Teacher.Name;";
+WHERE (((SCHOOLYEAR_ID)= " + Global.AktSj[0] + Global.AktSj[1] + ") AND  ((TERM_ID)=" + periode + ") AND ((Teacher.SCHOOL_ID)=177659) AND (((Teacher.Deleted)=No))) ORDER BY Teacher.Name;";
 
                     OleDbCommand oleDbCommand = new OleDbCommand(queryString, oleDbConnection);
                     oleDbConnection.Open();
@@ -59,8 +59,7 @@ WHERE (((SCHOOLYEAR_ID)= " + aktSj + ") AND  ((TERM_ID)=" + periode + ") AND ((T
                         }                        
                     };
 
-                    Console.WriteLine(("Lehrer*innen " + ".".PadRight(this.Count / 150, '.')).PadRight(48, '.') + (" " + this.Count).ToString().PadLeft(4), '.');
-                    File.AppendAllLines(Global.TeamsPs, new List<string>() { "# Anzahl Lehrer*innen in Untis : " + this.Count + "" }, Encoding.UTF8);
+                    Global.WriteLine("Lehrer", this.Count);
 
                     oleDbDataReader.Close();
                 }

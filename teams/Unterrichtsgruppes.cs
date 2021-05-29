@@ -9,9 +9,9 @@ namespace teams
 {
     public class Unterrichtsgruppes : List<Unterrichtsgruppe>
     {
-        public Unterrichtsgruppes(string aktSj, string connectionString)
+        public Unterrichtsgruppes()
         {
-            using (OleDbConnection oleDbConnection = new OleDbConnection(connectionString))
+            using (OleDbConnection oleDbConnection = new OleDbConnection(Global.ConnectionStringUntis))
             {
                 try
                 {
@@ -23,15 +23,11 @@ LessonGroup.DateTo,
 LessonGroup.InrerruptionsFrom,
 LessonGroup.InrerruptionsTo
 FROM LessonGroup
-WHERE (((SCHOOLYEAR_ID)= " + aktSj + ") AND ((LessonGroup.SCHOOL_ID)=177659)) ORDER BY LESSON_GROUP_ID;";
+WHERE (((SCHOOLYEAR_ID)= " + Global.AktSj[0] + Global.AktSj[1] + ") AND ((LessonGroup.SCHOOL_ID)=177659)) ORDER BY LESSON_GROUP_ID;";
 
                     OleDbCommand oleDbCommand = new OleDbCommand(queryString, oleDbConnection);
                     oleDbConnection.Open();
                     OleDbDataReader oleDbDataReader = oleDbCommand.ExecuteReader();
-
-                    Console.WriteLine("");
-                    Console.WriteLine("Unterrichtsgruppen");
-                    Console.WriteLine("------------------");
 
                     while (oleDbDataReader.Read())
                     {
@@ -55,11 +51,11 @@ WHERE (((SCHOOLYEAR_ID)= " + aktSj + ") AND ((LessonGroup.SCHOOL_ID)=177659)) OR
 
                         // Nach DateTo und vor DateFrom wird alles zur Interruption
 
-                        interruption.von.Add(new DateTime(Convert.ToInt32(aktSj.Substring(0, 4)), 8, 1));
+                        interruption.von.Add(new DateTime(Convert.ToInt32((Global.AktSj[0] + Global.AktSj[1]).Substring(0, 4)), 8, 1));
                         interruption.bis.Add(DateTime.ParseExact((oleDbDataReader.GetInt32(2)).ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture));
 
                         interruption.von.Add(DateTime.ParseExact((oleDbDataReader.GetInt32(3)).ToString(), "yyyyMMdd", System.Globalization.CultureInfo.InvariantCulture));
-                        interruption.bis.Add(new DateTime(Convert.ToInt32(aktSj.Substring(4, 4)), 7, 31));
+                        interruption.bis.Add(new DateTime(Convert.ToInt32((Global.AktSj[0] + Global.AktSj[1]).Substring(4, 4)), 7, 31));
 
                         Unterrichtsgruppe unterrichtsgruppe = new Unterrichtsgruppe()
                         {
@@ -70,7 +66,7 @@ WHERE (((SCHOOLYEAR_ID)= " + aktSj + ") AND ((LessonGroup.SCHOOL_ID)=177659)) OR
                             Interruption = interruption
                         };
 
-                        Console.WriteLine(" " + unterrichtsgruppe.IdUntis.ToString().PadLeft(3) + " " + unterrichtsgruppe.Name.PadRight(8) + " " + unterrichtsgruppe.Von.ToShortDateString() + " - " + unterrichtsgruppe.Bis.ToShortDateString());
+
 
                         // Bei 1.HJ werden alle Unterrichte des 2.HJ als Interruption eingetragen
 
@@ -135,8 +131,7 @@ WHERE (((SCHOOLYEAR_ID)= " + aktSj + ") AND ((LessonGroup.SCHOOL_ID)=177659)) OR
                         this.Add(unterrichtsgruppe);
                     };
                     oleDbDataReader.Close();
-                    Console.WriteLine("");
-                    File.AppendAllLines(Global.TeamsPs, new List<string>() { "# Anzahl Unterrichtsgruppen : " + this.Count + "" }, Encoding.UTF8);
+
 
                 }
                 catch (Exception ex)
@@ -147,6 +142,7 @@ WHERE (((SCHOOLYEAR_ID)= " + aktSj + ") AND ((LessonGroup.SCHOOL_ID)=177659)) OR
                 finally
                 {
                     oleDbConnection.Close();
+                    Global.WriteLine("Unterrichtsgruppen", this.Count);
                 }
             }
         }

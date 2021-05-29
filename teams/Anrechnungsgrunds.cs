@@ -10,7 +10,6 @@ namespace teams
         public Anrechnungsgrunds(string aktSj)
         {
             string topic = "Anrechnungsgründe";
-            string fehler = "";
 
             Console.WriteLine(topic + " ...");
 
@@ -20,7 +19,7 @@ namespace teams
                 {
                     string queryString = @"SELECT CV_Reason.CV_REASON_ID, CV_Reason.Name, CV_Reason.Longname, CV_Reason.DESCRIPTION_ID, CV_Reason.SortId
 WHERE DESCRIPTION_ID = 99
-FROM CV_Reason WHERE (((CV_Reason.SCHOOLYEAR_ID)= " + aktSj + ")) ORDER BY CV_Reason.SortId;";
+FROM CV_Reason WHERE (((CV_Reason.SCHOOLYEAR_ID)= " + Global.AktSj[0] + Global.AktSj[1] + ")) ORDER BY CV_Reason.SortId;";
 
 
                     OleDbCommand oleDbCommand = new OleDbCommand(queryString, oleDbConnection);
@@ -41,6 +40,7 @@ FROM CV_Reason WHERE (((CV_Reason.SCHOOLYEAR_ID)= " + aktSj + ")) ORDER BY CV_Re
                 }
                 catch (Exception ex)
                 {
+                    throw ex;
                 }
                 finally
                 {

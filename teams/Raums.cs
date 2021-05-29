@@ -14,9 +14,9 @@ namespace teams
         {
         }
 
-        public Raums(string aktSj, string connectionString, int periode)
+        public Raums(int periode)
         {
-            using (OleDbConnection oleDbConnection = new OleDbConnection(connectionString))
+            using (OleDbConnection oleDbConnection = new OleDbConnection(Global.ConnectionStringUntis))
             {
                 try
                 {
@@ -25,7 +25,7 @@ namespace teams
                                                     Room.Longname,
                                                     Room.Capacity
                                                     FROM Room
-                                                    WHERE (((Room.SCHOOLYEAR_ID)= " + aktSj + ") AND ((Room.SCHOOL_ID)=177659) AND  ((Room.TERM_ID)=" + periode + "))";
+                                                    WHERE (((Room.SCHOOLYEAR_ID)= " + Global.AktSj[0] + Global.AktSj[1] + ") AND ((Room.SCHOOL_ID)=177659) AND  ((Room.TERM_ID)=" + periode + "))";
 
                     OleDbCommand oleDbCommand = new OleDbCommand(queryString, oleDbConnection);
                     oleDbConnection.Open();
@@ -42,9 +42,6 @@ namespace teams
                         this.Add(raum);
                     };
 
-                    Console.WriteLine(("Räume " + ".".PadRight(this.Count / 150, '.')).PadRight(48, '.') + (" " + this.Count).ToString().PadLeft(4), '.');
-                    File.AppendAllLines(Global.TeamsPs, new List<string>() { "# Anzahl Räume : " + this.Count + "" }, Encoding.UTF8);
-
                     oleDbDataReader.Close();
 
                 }
@@ -56,6 +53,7 @@ namespace teams
                 finally
                 {
                     oleDbConnection.Close();
+                    Global.WriteLine("Räume", this.Count);
                 }
             }
         }

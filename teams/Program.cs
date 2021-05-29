@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace teams
 {
@@ -14,74 +15,42 @@ namespace teams
         {
             try
             {
-                List<string> aktSj = new List<string>();
+                Global.Initialize();
 
-                DateTime datumMontagDerKalenderwoche = new DateTime(2020, 08, 10); //GetMondayDateOfWeek(kalenderwoche, DateTime.Now.Year);
-                Global.TeamsPs = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal) + @"\\Teams.ps1";
-                Global.GruppenMemberPs = System.Environment.GetFolderPath(System.Environment.SpecialFolder.Personal) + @"\\GruppenOwnerMembers.csv";
+                Periodes periodes = new Periodes();
 
-                File.WriteAllText(Global.TeamsPs, @"# Skript zum tagesaktuellen Abgleich der Klassen aus Atlantis / Untis mit Office 365
-", Encoding.UTF8);
-                File.AppendAllLines(Global.TeamsPs, new List<string>() { "# " + DateTime.Now.Date.ToShortDateString() + " " + DateTime.Now.ToShortTimeString() + "" }, Encoding.UTF8);
-                Global.TeamsPs1 = new List<string>();
-                aktSj.Add((DateTime.Now.Month >= 8 ? DateTime.Now.Year : DateTime.Now.Year - 1).ToString());
-                aktSj.Add((DateTime.Now.Month >= 8 ? DateTime.Now.Year + 1 : DateTime.Now.Year).ToString());
+                var periode = (from p in periodes where p.Bis >= DateTime.Now.Date where DateTime.Now.Date >= p.Von select p.IdUntis).FirstOrDefault();
 
-                const string connectionString = @"Provider = Microsoft.Jet.OLEDB.4.0; Data Source=M:\\Data\\gpUntis.mdb;";
-
-                Periodes periodes = new Periodes(aktSj[0] + aktSj[1], connectionString);
-
-                var periode = (from p in periodes where p.Bis >= DateTime.Now where DateTime.Now.Date >= p.Von select p.IdUntis).FirstOrDefault();
-
-                Lehrers lehrers = new Lehrers(aktSj[0] + aktSj[1], connectionString, periode);                
-                
-                Klasses klasses = new Klasses(aktSj[0] + aktSj[1], lehrers, connectionString, periode);
-
-                // Tatsächlich existierende Teams ermitteln
+                Lehrers lehrers = new Lehrers(periode);
+                Klasses klasses = new Klasses(periode, lehrers);
+                Schuelers schuelers = new Schuelers(klasses);
+                Fachs fachs = new Fachs();
+                Raums raums = new Raums(periode);
+                Unterrichtsgruppes unterrichtsgruppes = new Unterrichtsgruppes();
+                Unterrichts unterrichts = new Unterrichts(periode, klasses, lehrers, fachs, raums, unterrichtsgruppes);
 
                 Teams teamsIst = new Teams(Global.GruppenMemberPs, klasses);
-
-                Schuelers schuelers = new Schuelers(klasses, aktSj[0] + aktSj[1]);
-                Fachs fachs = new Fachs(aktSj[0] + aktSj[1], connectionString);
-                Raums raums = new Raums(aktSj[0] + aktSj[1], connectionString, periode);
-                Unterrichtsgruppes unterrichtsgruppes = new Unterrichtsgruppes(aktSj[0] + aktSj[1], connectionString);
-                Unterrichts unterrichts = new Unterrichts(aktSj[0] + aktSj[1], datumMontagDerKalenderwoche, connectionString, periode, klasses, lehrers, fachs, raums, unterrichtsgruppes);
-
-                Teams teamsSoll = new Teams() { };
                 
-                Teams klassenteams = new Teams(klasses, lehrers, schuelers, unterrichts);
-                Teams klassenleitung = new Teams(klasses, lehrers);
-                Teams lehrerinnen = new Teams(lehrers, "Lehrerinnen");
-                Teams vollzeitkraefte = new Teams(lehrers, "Vollzeit");
-                Teams teilzeitkraefte = new Teams(lehrers, "Teilzeit");
-                Teams bildungsgänge = new Teams(klassenteams);
-
-                Team gym13LuL = new Team(klassenteams, Convert.ToInt32(aktSj[0].Substring(2,2)), "Gym13LuL");
-                Team anlageBCAbschlussklassenLuL = new Team(klassenteams, Convert.ToInt32(aktSj[0].Substring(2, 2)), "AnlageBCAbschlussklassenLuL");
-                Team blaueBriefe = new Team(klassenteams, Convert.ToInt32(aktSj[0].Substring(2, 2)), "BlaueBriefe");
-                Team bildungsgangleitungen = new Team(lehrers, "Bildungsgangleitungen");
-                Team oeffentlichkeitsarbeit = new Team(lehrers, "Oeffentlichkeitsarbeit");
-                Team praktikantenbetreuung = new Team(lehrers, "Praktikantenbetreuung");
-
-                teamsSoll.AddRange(klassenteams);
-                teamsSoll.AddRange(klassenleitung);
-                teamsSoll.AddRange(lehrerinnen);
-                teamsSoll.AddRange(vollzeitkraefte);
-                teamsSoll.AddRange(teilzeitkraefte);
-                teamsSoll.AddRange(bildungsgänge);
-                teamsSoll.Add(gym13LuL);
-                teamsSoll.Add(anlageBCAbschlussklassenLuL);
-                teamsSoll.Add(blaueBriefe);
-                teamsSoll.Add(bildungsgangleitungen);
-                teamsSoll.Add(oeffentlichkeitsarbeit);
-                teamsSoll.Add(praktikantenbetreuung);
-
-                teamsSoll.VerteilerGruppenAnlegen(teamsIst);
-                //teamsSoll.FehlendeKlassenTeamsAnlegen(teamsIst);
-
-
+                Teams klassenteamsSoll = new Teams(klasses, lehrers, schuelers, unterrichts);
                 
+                teamsIst.SyncTeam(false, true, lehrers, new Team(klassenteamsSoll, "Kurs-20-Abiturienten"));
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, "Gym13LuL"));
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, "BCAbschlussklassenLuL"));
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, "BlaueBriefe"));
+                teamsIst.SyncTeam(false, true, lehrers, new Team(lehrers)); // Kollegium
 
+                teamsIst.SyncTeams(true, false, lehrers, new Teams(klasses, lehrers)); // Klassenleitung
+                teamsIst.SyncTeams(true, false, lehrers, new Teams(lehrers, "Lehrerinnen"));
+                teamsIst.SyncTeams(true, false, lehrers, new Teams(lehrers, "Vollzeitkraefte"));
+                teamsIst.SyncTeams(true, false, lehrers, new Teams(lehrers, "Teilzeitkraefte"));
+                teamsIst.SyncTeams(true, false, lehrers, new Teams(klassenteamsSoll));
+                
+                // Teams aus den Untis-Anrechnungen
+
+                foreach (var untisAnrechnung in GetUntisAnrechnungen(lehrers))
+                {
+                    teamsIst.SyncTeam(true, false, lehrers, new Team(lehrers, untisAnrechnung));
+                }
 
                 if (!File.Exists(Global.TeamsPs))
                 {
@@ -89,37 +58,11 @@ namespace teams
                     File.Create(Global.GruppenMemberPs);
                 }
 
-                try
-                {
-                    File.AppendAllLines(Global.TeamsPs, new List<string>() { "", "$confirm = $true" }, Encoding.UTF8);
-                    File.AppendAllText(Global.TeamsPs, Global.Auth(), Encoding.UTF8);
-                    File.AppendAllText(Global.TeamsPs, Global.GruppenAuslesen(teamsIst.Count), Encoding.UTF8);
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception(" Die Datei Teams.ps1 ist von einem anderen Prozess gesperrt.\n\n" + ex);                    
-                }
-
-
-
-                
-
-                teamsSoll.VerteilergruppeMemberAnlegen(teamsIst);
-                teamsIst.VerteilergruppenMemberLöschen(teamsSoll, lehrers);
-
-
-
-                /*teamsIst.DoppelteKlassenFinden();
-
-                teamsSoll.TeamOwnerUndMemberAnlegen(teamsIst);
-                teamsIst.OwnerUndMemberLöschen(teamsSoll, lehrers);*/
-                                
                 Global.TeamsPs1.Add("    Write-Host 'Ende der Verarbeitung'");
                 File.AppendAllLines(Global.TeamsPs, Global.TeamsPs1, Encoding.UTF8);
-                File.AppendAllText(Global.TeamsPs, Global.Ende(), Encoding.UTF8);
-                
-                Console.WriteLine("Verarbeitung beendet.");
-                Console.WriteLine("Öffnen Sie jetzt die ISE als Administrator. Öffnen Sie in der ISE die Datei " + Global.TeamsPs + ". ");
+                Console.ReadKey();
+                Environment.Exit(0);
+
             }
             catch (Exception ex)
             {
@@ -128,9 +71,24 @@ namespace teams
             }
             finally
             {
-                Console.ReadKey();
-                Environment.Exit(0);                
+
             }
+        }
+
+        private static List<string> GetUntisAnrechnungen(Lehrers lehrers)
+        {
+            var untisanrechnungen =new List<string>();
+            untisanrechnungen.AddRange((from l in lehrers from a in l.Anrechnungen select a.Beschr).ToList().Distinct());
+
+            foreach (var an in (from l in lehrers from a in l.Anrechnungen select a.TextGekürzt).Distinct().ToList())
+            {
+                if (!untisanrechnungen.Contains(an))
+                {
+                    untisanrechnungen.Add(an);
+                }
+            }
+
+            return untisanrechnungen;
         }
 
         //private static void NeueGruppe(string displayName, List<string> owner, List<string> member, bool inOutlookVerstecken, bool teamAnlegen)
@@ -156,9 +114,9 @@ namespace teams
         //        File.AppendAllText(Global.TeamsPs1,"else { New-UnifiedGroup -DisplayName '" + displayName + "' -EmailAddresses: '" + displayName.Replace(' ', '-') + "@berufskolleg-borken.de' -Notes '" + displayName + "' -Language 'de-DE' -AccessType Private -AutoSubscribeNewMembers }");
         //        File.AppendAllText(Global.TeamsPs1,"");
         //    }
-            
+
         //    File.AppendAllText(Global.TeamsPs1,"$teamsgroups = (Get-UnifiedGroup | Where-Object{($_.PrimarySmtpAddress -eq '" + displayName.Replace(' ', '-') + "@berufskolleg-borken.de')} | Select-Object Name).Name");
-            
+
         //    File.AppendAllText(Global.TeamsPs1,"Get-UnifiedGroup -Identity $teamsgroups | Format-List DisplayName,EmailAddresses,Notes,ManagedBy,AccessType");
 
         //    // in Outlook verstecken
@@ -173,7 +131,7 @@ namespace teams
         //        File.AppendAllText(Global.TeamsPs1,"Set-UnifiedGroup -Identity $teamsgroups -HiddenFromExchangeClientsEnabled:$False");
         //        File.AppendAllText(Global.TeamsPs1,"Set-UnifiedGroup -Identity $teamsgroups -HiddenFromAddressListsEnabled $false");
         //    }
-            
+
         //    File.AppendAllText(Global.TeamsPs1,"Get-UnifiedGroup -Identity $teamsgroups | ft DisplayName,HiddenFrom*");
         //    File.AppendAllText(Global.TeamsPs1,"");
 

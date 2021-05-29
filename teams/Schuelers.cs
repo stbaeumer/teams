@@ -17,7 +17,7 @@ namespace teams
         {
         }
 
-        public Schuelers(Klasses klasses, string aktSj)
+        public Schuelers(Klasses klasses)
         {
             Schuelers atlantisschulers = new Schuelers();
 
@@ -368,7 +368,7 @@ schue_sj.durchschnitts_note_jz AS DurchschnittsnoteJahreszeugnis,
          ) 
 ORDER BY ausgetreten DESC, klasse, schueler.name_1, schueler.name_2", connection);
 
-                Console.WriteLine(("Schüler*innen " + ".".PadRight(this.Count / 150, '.')).PadRight(48, '.') + (" " + this.Count).ToString().PadLeft(4), '.');
+                
 
                 connection.Open();
                 schuelerAdapter.Fill(dataSet, "DBA.schueler");
@@ -407,11 +407,6 @@ ORDER BY ausgetreten DESC, klasse, schueler.name_1, schueler.name_2", connection
 
                         schueler.LSSchulnummer = theRow["LSSchulnummer"] == null ? "" : theRow["LSSchulnummer"].ToString();
 
-                        if (schueler.Vorname == "Tarik Lukas")
-                        {
-                            string a = "";
-                        }
-
                         if (schueler.Bezugsjahr == (DateTime.Now.Month >= 8 ? DateTime.Now.Year : DateTime.Now.Year - 1) && schueler.Status != "VB" && schueler.Status != "8" && schueler.Status != "9" && schueler.Klasse != "Z" && schueler.AktuellJN == "J")
                         {
                             // Duplikate werden verhindert.
@@ -430,13 +425,6 @@ ORDER BY ausgetreten DESC, klasse, schueler.name_1, schueler.name_2", connection
 
                 var cc = (from k in atlantisschulers where k.Status == "A" where k.Austrittsdatum > new DateTime(2020,08,10) where k.Austrittsdatum < DateTime.Now select k).ToList();
 
-                Console.WriteLine("Ausgetretene Schülerinnen und Schüler, deren Status 'aktiv' ist.");
-
-                foreach (var item in cc)
-                {
-                    Console.WriteLine(item.Nachname + " " + item.Vorname + " " + item.Klasse);
-                }
-
                 using (OleDbConnection oleDbConnection = new OleDbConnection(Global.ConnectionStringUntis))
                 {
                     string sch = "";
@@ -453,7 +441,7 @@ Flags,
 Student_ID,
 CLASS_ID
 FROM Student 
-WHERE SCHOOLYEAR_ID =" + aktSj + ";";
+WHERE SCHOOLYEAR_ID =" + Global.AktSj[0] + Global.AktSj[1] + ";";
 
                         OleDbCommand oleDbCommand = new OleDbCommand(queryString, oleDbConnection);
                         oleDbConnection.Open();
@@ -479,11 +467,6 @@ WHERE SCHOOLYEAR_ID =" + aktSj + ";";
 
                             sch = schueler.Nachname + ", " + schueler.Vorname;
 
-
-                            if (schueler.Vorname == "Tarik Lukas")
-                            {
-                                string a = "";
-                            }
                             schueler.Anmeldename = Global.SafeGetString(oleDbDataReader, 5);
                             schueler.GeschlechtMw = Global.SafeGetString(oleDbDataReader, 6);
                             schueler.IdUntis = oleDbDataReader.GetInt32(7);
@@ -527,14 +510,13 @@ WHERE SCHOOLYEAR_ID =" + aktSj + ";";
                     }
                     catch (Exception ex)
                     {
-                        throw;
+                        throw ex;
                     }
                     finally
                     {
                         oleDbConnection.Close();
 
-                        Console.WriteLine(this.Count);
-                        File.AppendAllLines(Global.TeamsPs, new List<string>() { "# Anzahl Schüler : " + this.Count + "" }, Encoding.UTF8);
+                        Global.WriteLine("Schüler", this.Count);
                     }
                 }
             }
