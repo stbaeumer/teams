@@ -10,53 +10,73 @@ namespace teams
         public string TeamId { get; set; }
         public List<string> Owners { get; set; }
         public List<string> Members { get; set; }
-        public string Kategorie { get; set; }
+        public string Kategorie { get; set; }        
         /// <summary>
         /// Der Typ ist entweder 0365 oder Distribution
         /// </summary>
         public string Typ { get; set; }
 
-        //public Team(string displayName, List<Lehrer> kollegium)
-        //{
-        //    DisplayName = displayName;
-        //    Owners = kollegium;
-        //}
-
-        public Team(string displayName, string teamId, string ownerMail, string memberMail, string typ, string kategorie)
+        public Team()
         {
-            Owners = new List<string>();
-            Members = new List<string>();
-            DisplayName = displayName;
-            TeamId = teamId;
-            Kategorie = kategorie;
-            Typ = typ;
-
-            if (ownerMail != null)
-            {
-                Owners.Add(ownerMail);
-            }
-            if (memberMail != null)
-            {
-                Members.Add(memberMail);
-            }
         }
 
         public Team(string displayName, string kategorie)
         {
             this.DisplayName = displayName;
             Kategorie = kategorie;
-            Owners = new List<string>();
-            Members = new List<string>();
+            Owners = new List<string>() { };
+            Members = new List<string>() { };
+
+            if (Kategorie != "Klasse")
+            {
+                Owners.Add("stefan.baeumer@berufskolleg-borken.de");
+                Members.Add("stefan.baeumer@berufskolleg-borken.de");
+            }
         }
 
-        public Team(Teams klassenteams, string name)
+        public Team(Teams klassenteams, Klasses klasses, Lehrers lehrers, string name)
         {
             Members = new List<string>();
             Owners = new List<string>();
             DisplayName = name;
+
             int sj = Convert.ToInt32(Global.AktSj[0].Substring(2, 2));
 
-            if (name == "Gym13LuL")
+            if (name == "Gym13-Klassenleitungen")
+            {
+                foreach (var klasse in klasses)
+                {
+                    if (klasse.NameUntis.StartsWith("G") && klasse.NameUntis.Contains((sj - 2).ToString()))
+                    {
+                        foreach (var klassenleitung in klasse.Klassenleitungen)
+                        {
+                            if (!this.Members.Contains(klassenleitung.Mail))
+                            {
+                                this.Members.Add(klassenleitung.Mail);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (name == "Gym13-SuS")
+            {
+                foreach (var klassenTeam in klassenteams)
+                {
+                    if (klassenTeam.DisplayName.StartsWith("G") && klassenTeam.DisplayName.Contains((sj - 2).ToString()))
+                    {
+                        foreach (var member in klassenTeam.Members)
+                        {
+                            if (!this.Members.Contains(member) && member.Contains("student"))
+                            {
+                                this.Members.Add(member);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (name == "Gym13-LuL")
             {
                 foreach (var klassenTeam in klassenteams)
                 {
@@ -73,7 +93,7 @@ namespace teams
                 }
             }
 
-            if (name == "AnlageBCAbschlussklassenLuL")
+            if (name == "AbschlussklassenBC-LuL")
             {
                 foreach (var klassenTeam in klassenteams)
                 {
@@ -94,12 +114,58 @@ namespace teams
                     }
                 }
             }
-            if (name == "BlaueBriefe")
+
+            if (name == "AbschlussklassenBC-SuS")
+            {
+                foreach (var klassenTeam in klassenteams)
+                {
+                    if (
+                            klassenTeam.DisplayName.StartsWith("BS") && klassenTeam.DisplayName.Contains((sj - 1).ToString()) ||
+                            klassenTeam.DisplayName.StartsWith("HB") && klassenTeam.DisplayName.Contains((sj - 1).ToString()) ||
+                            klassenTeam.DisplayName.StartsWith("FM") && klassenTeam.DisplayName.Contains((sj).ToString()) ||
+                            klassenTeam.DisplayName.StartsWith("FS") && klassenTeam.DisplayName.Contains((sj - 1).ToString())
+                        )
+                    {
+                        foreach (var member in klassenTeam.Members)
+                        {
+                            if (!this.Members.Contains(member) && member.Contains("student"))
+                            {
+                                this.Members.Add(member);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (name == "AbschlussklassenBC-Klassenleitungen")
+            {
+                foreach (var klasse in klasses)
+                {
+                    if (
+                            klasse.NameUntis.StartsWith("BS") && klasse.NameUntis.Contains((sj - 1).ToString()) ||
+                            klasse.NameUntis.StartsWith("HB") && klasse.NameUntis.Contains((sj - 1).ToString()) ||
+                            klasse.NameUntis.StartsWith("FM") && klasse.NameUntis.Contains((sj).ToString()) ||
+                            klasse.NameUntis.StartsWith("FS") && klasse.NameUntis.Contains((sj - 1).ToString())
+                        )
+                    {
+                        foreach (var klassenleitung in klasse.Klassenleitungen)
+                        {
+                            if (!this.Members.Contains(klassenleitung.Mail))
+                            {
+                                this.Members.Add(klassenleitung.Mail);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (name == "BlaueBriefe-LuL")
             {
                 foreach (var klassenTeam in klassenteams)
                 {
                     if (
                             klassenTeam.DisplayName.StartsWith("G") && klassenTeam.DisplayName.Contains((sj).ToString()) ||
+                            klassenTeam.DisplayName.StartsWith("BS") && klassenTeam.DisplayName.Contains((sj).ToString()) ||
                             klassenTeam.DisplayName.StartsWith("HB") && klassenTeam.DisplayName.Contains((sj).ToString())
                         )
                     {
@@ -113,21 +179,215 @@ namespace teams
                     }
                 }
             }
-            if (name == "Kurs-20-Abiturienten")
+
+            // Halbjahreszeugniskonferenzen
+
+            if (name == "Halbjahreszeugniskonferenzen BS HBG FS") // namensgleich mit Outlook-Termin
             {
                 foreach (var klassenTeam in klassenteams)
                 {
                     if (
-                            klassenTeam.DisplayName.StartsWith("G") && klassenTeam.DisplayName.Contains((sj - 2).ToString())
+                            klassenTeam.DisplayName.StartsWith("BS") ||
+                            klassenTeam.DisplayName.StartsWith("FS") ||
+                            klassenTeam.DisplayName.StartsWith("HBG")
                         )
                     {
                         foreach (var member in klassenTeam.Members)
                         {
-                            if (!this.Members.Contains(member) && member.Contains("student"))
+                            if (!this.Members.Contains(member) && !member.Contains("student"))
                             {
                                 this.Members.Add(member);
                             }
                         }
+                    }
+                }
+            }
+
+            if (name == "Halbjahreszeugniskonferenzen BW HBW") // namensgleich mit Outlook-Termin
+            {
+                foreach (var klassenTeam in klassenteams)
+                {
+                    if (
+                            klassenTeam.DisplayName.StartsWith("BW") ||
+                            klassenTeam.DisplayName.StartsWith("HBW")
+                        )
+                    {
+                        foreach (var member in klassenTeam.Members)
+                        {
+                            if (!this.Members.Contains(member) && !member.Contains("student"))
+                            {
+                                this.Members.Add(member);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (name == "Halbjahreszeugniskonferenzen BT HBT FM") // namensgleich mit Outlook-Termin
+            {
+                foreach (var klassenTeam in klassenteams)
+                {
+                    if (
+                            klassenTeam.DisplayName.StartsWith("BT") ||
+                            klassenTeam.DisplayName.StartsWith("HBT") ||
+                            klassenTeam.DisplayName.StartsWith("FM")
+                       )
+                    {
+                        foreach (var member in klassenTeam.Members)
+                        {
+                            if (!this.Members.Contains(member) && !member.Contains("student"))
+                            {
+                                this.Members.Add(member);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (name == "Halbjahreszeugniskonferenzen GE GT GW") // namensgleich mit Outlook-Termin
+            {
+                foreach (var klassenTeam in klassenteams)
+                {
+                    if (
+                            klassenTeam.DisplayName.StartsWith("G")
+                        )
+                    {
+                        foreach (var member in klassenTeam.Members)
+                        {
+                            if (!this.Members.Contains(member) && !member.Contains("student"))
+                            {
+                                this.Members.Add(member);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Jahreszeugniskonferenzen
+
+            if (name == "Jahreszeugniskonferenzen BS HBG FS") // namensgleich mit Outlook-Termin
+            {
+                foreach (var klassenTeam in klassenteams)
+                {
+                    if (
+                            (klassenTeam.DisplayName.StartsWith("BS") && klassenTeam.DisplayName.Contains((sj).ToString())) ||
+                            (klassenTeam.DisplayName.StartsWith("FS") && klassenTeam.DisplayName.Contains((sj).ToString())) ||                            
+                            (klassenTeam.DisplayName.StartsWith("HBG") && klassenTeam.DisplayName.Contains((sj).ToString()))
+                        )
+                    {
+                        foreach (var member in klassenTeam.Members)
+                        {
+                            if (!this.Members.Contains(member) && !member.Contains("student"))
+                            {
+                                this.Members.Add(member);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (name == "Jahreszeugniskonferenzen BW HBW") // namensgleich mit Outlook-Termin
+            {
+                foreach (var klassenTeam in klassenteams)
+                {
+                    if (
+                            klassenTeam.DisplayName.StartsWith("BW") ||                            
+                            (klassenTeam.DisplayName.StartsWith("HBW") && klassenTeam.DisplayName.Contains((sj).ToString()))
+                        )
+                    {
+                        foreach (var member in klassenTeam.Members)
+                        {
+                            if (!this.Members.Contains(member) && !member.Contains("student"))
+                            {
+                                this.Members.Add(member);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (name == "Jahreszeugniskonferenzen BT HBT") // namensgleich mit Outlook-Termin
+            {
+                foreach (var klassenTeam in klassenteams)
+                {
+                    if (
+                            klassenTeam.DisplayName.StartsWith("BT") ||
+                            (klassenTeam.DisplayName.StartsWith("HBT") && klassenTeam.DisplayName.Contains((sj).ToString()))
+                        )
+                    {
+                        foreach (var member in klassenTeam.Members)
+                        {
+                            if (!this.Members.Contains(member) && !member.Contains("student"))
+                            {
+                                this.Members.Add(member);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (name == "Jahreszeugniskonferenzen GE GT GW") // namensgleich mit Outlook-Termin
+            {
+                foreach (var klassenTeam in klassenteams)
+                {
+                    if (
+                            (klassenTeam.DisplayName.StartsWith("G") && !klassenTeam.DisplayName.Contains((sj - 2).ToString()))                            
+                        )
+                    {
+                        foreach (var member in klassenTeam.Members)
+                        {
+                            if (!this.Members.Contains(member) && !member.Contains("student"))
+                            {
+                                this.Members.Add(member);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (name == "Kollegium")
+            {
+                foreach (var lehrer in lehrers)
+                {
+                    if (!this.Members.Contains(lehrer.Mail))
+                    {
+                        this.Members.Add(lehrer.Mail);
+                    }
+                }
+            }
+
+            if (name == "Lehrerinnen")
+            {
+                foreach (var lehrer in lehrers)
+                {
+                    if (lehrer.Geschlecht == "w")
+                    {
+                        if (!this.Members.Contains(lehrer.Mail))
+                        {
+                            this.Members.Add(lehrer.Mail);
+                        }
+                    }
+                }
+            }
+
+            if (name == "Vollzeit")
+            {
+                foreach (var vollzeitkraft in (from l in lehrers where l.Deputat == 25.5 select l))
+                {
+                    if (!this.Members.Contains(vollzeitkraft.Mail))
+                    {
+                        this.Members.Add(vollzeitkraft.Mail);
+                    }
+                }
+            }
+
+            if (name == "Teilzeit")
+            {
+                foreach (var teilzeitkraft in (from l in lehrers where l.Deputat < 25.5 select l))
+                {
+                    if (!this.Members.Contains(teilzeitkraft.Mail))
+                    {
+                        this.Members.Add(teilzeitkraft.Mail);
                     }
                 }
             }
@@ -145,7 +405,6 @@ namespace teams
                 }
                 else
                 {
-
                     if (Kategorie == "Klasse")
                     {
                         Console.WriteLine(" Die Klassengruppen müssen zuerst händisch angelegt werden. Danach bitte neu starten.");
@@ -164,7 +423,15 @@ namespace teams
                 {
                     Console.WriteLine("[+] Neuer " + teamIst.Typ.Substring(0,4) + "-Member : " + sollMember.PadRight(30) + " -> " + teamIst.DisplayName);
                     Global.TeamsPs1.Add(@"    Write-Host '[+] Neuer " + teamIst.Typ.Substring(0, 4) + "-Member : " + sollMember.PadRight(30) + " -> " + teamIst.DisplayName + "'");
-                    Global.TeamsPs1.Add(@"    Add-UnifiedGroupLinks -Identity " + this.TeamId + " -LinkType Member -Links '" + sollMember + "' -Confirm:$confirm");
+
+                    if (teamIst.Typ == "O365")
+                    {
+                        Global.TeamsPs1.Add(@"    Add-UnifiedGroupLinks -Identity " + teamIst.TeamId + " -LinkType Member -Links '" + sollMember + "' -Confirm:$confirm");
+                    }
+                    if (teamIst.Typ == "Distribution")
+                    {
+                        Global.TeamsPs1.Add(@"    Add-DistributionGroupMember -Identity " + teamIst.DisplayName + " -Member '" + sollMember + "' -Confirm:$confirm");
+                    }                    
                 }
             }
             foreach (var sollOwner in this.Owners)
@@ -173,7 +440,17 @@ namespace teams
                 {
                     Console.WriteLine("[+] Neuer " + teamIst.Typ.Substring(0, 4) + "-Owner : " + sollOwner.PadRight(30) + " -> " + teamIst.DisplayName);
                     Global.TeamsPs1.Add(@"    Write-Host '[+] Neuer " + teamIst.Typ.Substring(0, 4) + "-Owner : " + sollOwner.PadRight(30) + " -> " + teamIst.DisplayName + "'");
-                    Global.TeamsPs1.Add(@"    Add-UnifiedGroupLinks -Identity " + this.TeamId + " -LinkType Owner -Links '" + sollOwner + "' -Confirm:$confirm");
+                    if (teamIst.Typ == "O365")
+                    {
+                        Global.TeamsPs1.Add(@"    Add-UnifiedGroupLinks -Identity " + teamIst.TeamId + " -LinkType Owner -Links '" + sollOwner + "' -Confirm:$confirm");
+                    }
+
+                    // In Verteilergruppen werden alle Owner zu Member
+
+                    if (teamIst.Typ == "Distribution" && !teamIst.Members.Contains(sollOwner))
+                    {
+                        Global.TeamsPs1.Add(@"    Add-DistributionGroupMember -Identity " + teamIst.DisplayName + " -Member '" + sollOwner + "' -Confirm:$confirm");
+                    }
                 }
             }
         }
@@ -181,10 +458,14 @@ namespace teams
         internal void OwnerUndMemberLöschen(Team teamSoll, Lehrers lehrers)
         {
             foreach (var istMember in this.Members)
-            {
-                if ((from l in lehrers where l.Mail == istMember select l).Any())
+            { 
+                if (!teamSoll.Members.Contains(istMember))
                 {
-                    if (!teamSoll.Members.Contains(istMember))
+                    // Schüler werden bedingungslos gelöscht.
+                    // Lehrer werden nur im August, September und nach den HZ-Zeugniskonferenzen gelöscht.
+                    // Andere Member (Sekretariat usw.) werden nie gelöscht.
+
+                    if (istMember.Contains("students") || (lehrers.istLehrer(istMember) && (DateTime.Now.Month == 9 || DateTime.Now.Month == 8 || (DateTime.Now.Month == 2 && DateTime.Now.Day > 8))))
                     {
                         Console.WriteLine("[-] Owner  entfernen:" + istMember.PadRight(30) + " aus " + this.DisplayName);
                         Global.TeamsPs1.Add(@"    Write-Host '[-] Owner  entfernen: " + this.DisplayName.PadRight(30) + " aus " + this.DisplayName + "'");
@@ -196,23 +477,30 @@ namespace teams
             {
                 if (!teamSoll.Owners.Contains(istOwner))
                 {
-                    // Nur Lehrer werden gelöscht
-
-                    if ((from l in lehrers where l.Mail == istOwner select l).Any())
+                    if ((DateTime.Now.Month == 9 || DateTime.Now.Month == 8 || (DateTime.Now.Month == 2 && DateTime.Now.Day > 8)) && !istOwner.Contains("students"))
                     {
-                        Console.WriteLine("[-] Owner  entfernen:" + istOwner.PadRight(30) + " aus " + this.DisplayName);
-                        Global.TeamsPs1.Add(@"    Write-Host '[-] Owner  entfernen: " + this.DisplayName.PadRight(30) + " aus " + this.DisplayName + "'");
-                        Global.TeamsPs1.Add(@"    Remove-UnifiedGroupLinks -Identity " + this.TeamId + " -LinkType Owner -Links '" + istOwner + "' -Confirm:$confirm"); // -Confirm:$false
+                        // Lehrer werden nur im August, September und nach den HZ-Zeugniskonferenzen gelöscht.
+
+                        if ((from l in lehrers where l.Mail == istOwner select l).Any())
+                        {
+                            Console.WriteLine("[-] Owner  entfernen:" + istOwner.PadRight(30) + " aus " + this.DisplayName);
+                            Global.TeamsPs1.Add(@"    Write-Host '[-] Owner  entfernen: " + this.DisplayName.PadRight(30) + " aus " + this.DisplayName + "'");
+                            Global.TeamsPs1.Add(@"    Remove-UnifiedGroupLinks -Identity " + this.TeamId + " -LinkType Owner -Links '" + istOwner + "' -Confirm:$confirm"); // -Confirm:$false
+                        }
                     }
                 }
             }
         }
-
-        public Team(Lehrers lehrers, string name)
+        /// <summary>
+        /// Anrechnungen
+        /// </summary>
+        /// <param name="lehrers"></param>
+        /// <param name="untisAnrechnung"></param>
+        public Team(Lehrers lehrers, string untisAnrechnung)
         {
             this.Members = new List<string>();
             this.Owners = new List<string>();
-            this.DisplayName = name.Replace("--", "-")
+            this.DisplayName = untisAnrechnung.Replace("--", "-")
                                         .Replace("---", "-")
                                         .Replace("ä", "ae")
                                         .Replace("ö", "oe")
@@ -229,7 +517,7 @@ namespace teams
             {
                 foreach (var anrechnung in lehrer.Anrechnungen)
                 {
-                    if (anrechnung.Beschr == name)
+                    if (anrechnung.Beschr == untisAnrechnung)
                     {
                         if (!this.Members.Contains(lehrer.Mail))
                         {
@@ -238,23 +526,6 @@ namespace teams
                     }
                 }
             }
-        }
-
-        public Team(Lehrers lehrers)
-        {
-            this.Members = new List<string>();
-            this.Owners = new List<string>();
-            this.DisplayName = "Kollegium";
-
-            foreach (var lehrer in lehrers)
-            {
-                this.Members.Add(lehrer.Mail);
-                this.Owners.Add(lehrer.Mail);
-            }
-        }
-
-        public Team()
-        {
         }
     }
 }

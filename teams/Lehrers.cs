@@ -37,14 +37,14 @@ WHERE (((SCHOOLYEAR_ID)= " + Global.AktSj[0] + Global.AktSj[1] + ") AND  ((TERM_
                     OleDbDataReader oleDbDataReader = oleDbCommand.ExecuteReader();
 
                     while (oleDbDataReader.Read())
-                    {
+                    {                        
                         Lehrer lehrer = new Lehrer()
                         {
                             IdUntis = oleDbDataReader.GetInt32(0),
                             Kürzel = Global.SafeGetString(oleDbDataReader, 1),
                             Mail = Global.SafeGetString(oleDbDataReader, 4),
                             Deputat = Convert.ToDouble(oleDbDataReader.GetInt32(5)) / 1000,
-                            Geschlecht = Global.SafeGetString(oleDbDataReader, 6) == "W" ? "w" : "m",
+                            Geschlecht = Global.SafeGetString(oleDbDataReader, 6).Contains("W") ? "w" : "m",                            
                             Anrechnungen = (from a in anrechnungen where a.TeacherIdUntis == oleDbDataReader.GetInt32(0) select a).ToList()
                         };
 
@@ -53,7 +53,7 @@ WHERE (((SCHOOLYEAR_ID)= " + Global.AktSj[0] + Global.AktSj[1] + ") AND  ((TERM_
                             lehrer.Mail = lehrer.Mail.Replace("ertrud", "erti");
                         }
 
-                        if (lehrer.Deputat > 0 && lehrer.Mail != null && lehrer.Mail != "")
+                        if (lehrer.Mail != "")                            
                         {
                             this.Add(lehrer);
                         }                        
@@ -75,5 +75,16 @@ WHERE (((SCHOOLYEAR_ID)= " + Global.AktSj[0] + Global.AktSj[1] + ") AND  ((TERM_
             }
         }
 
+        internal bool istLehrer(string istMember)
+        {
+            foreach (var item in this)
+            {
+                if (item.Mail == istMember)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

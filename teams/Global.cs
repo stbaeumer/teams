@@ -72,6 +72,16 @@ namespace teams
             }
         }
 
+        internal static string Anrechnungen()
+        {
+            return @"
+# Im Folgenden werden Verteilergruppen gepflegt, die sich aus den Untis-Anrechnungen ergeben. Dabei gilt:
+# * Zu jeder Anrechnung kann ein Text und eine Beschreibung definiert werden.
+# * Sobald eine Beschreibung bei 2 oder mehr LuL zum Einsatz kommt, wird eine Verteilergruppe gebildet, in der alle LuL mit dieser Beschreibung Member sind. 
+# 
+";
+        }
+
         public static string SafeGetString(OleDbDataReader reader, int colIndex)
         {
             if (!reader.IsDBNull(colIndex))
@@ -108,7 +118,9 @@ if(-not($testSession))
 else
 {
     Write-Host '$targetComputer: Sie sind angemeldet.'    
-}";
+}
+
+";
 
 
         }
@@ -120,13 +132,10 @@ else
 # Da die GruppenOwnerMember.csv nicht von heute ist, wird sie nun erstellt. ...
 # Anschließend muss Teams.exe erneut gestartet werden.    
 
-Write-Host -ForegroundColor Green 'Alle Office 365-Gruppen und Verteilergruppen werden geladen ...'
+Write-Host -ForegroundColor Green 'Alle Office 365-Gruppen werden geladen ...'
 $Groups = Get-UnifiedGroup -ResultSize Unlimited  | Sort-Object DisplayName
 
-# Process Groups
 $GroupsCSV = @()
-
-Write-Host -ForegroundColor Green 'Processing Groups'
 
 $results = foreach ($Group in $Groups)
 {
@@ -134,8 +143,7 @@ $results = foreach ($Group in $Groups)
     $Owners = Get-UnifiedGroupLinks -Identity $Group.Identity -LinkType Owners -ResultSize Unlimited
     
     foreach ($Owner in $Owners)
-    {
-         
+    {         
             [pscustomobject]@{
             GroupId = $Group.Identity
             GroupDisplayName = $Group.DisplayName
@@ -163,11 +171,6 @@ $results = foreach ($Group in $Groups)
 
 Write-Host -ForegroundColor Green 'Alle Verteilergruppen werden geladen'
 $Groups = Get-DistributionGroup -ResultSize Unlimited | Sort-Object DisplayName
-       
-
-# Process Groups
-    
-Write-Host -ForegroundColor Green 'Processing Groups'
 
 $resultsV = foreach ($Group in $Groups)
 {
@@ -193,15 +196,15 @@ $results = $results + $resultsV
 Write-Host -ForegroundColor Green 'GruppenOwnerMembers.csv wird geschrieben. Nun kann Teams.exe erneut gestartet werden.'
 $results | Export-Csv -NoTypeInformation -Path C:\users\bm\Documents\GruppenOwnerMembers.csv -Encoding UTF8 -Delimiter '|'
 start notepad++ C:\users\bm\Documents\GruppenOwnerMembers.csv    
-start-process -FilePath 'U:\Source\Repos\teams\teams\bin\Debug\teams.exe'
+# start-process -FilePath 'U:\Source\Repos\teams\teams\bin\Debug\teams.exe'
 
 ";
         }
 
         internal static void WriteLine(string v, int count)
         {
-            Console.WriteLine((v + " " + ".".PadRight(count / 150, '.')).PadRight(48, '.') + (" " + count).ToString().PadLeft(4), '.');
-            File.AppendAllLines(Global.TeamsPs, new List<string>() { "# Anzahl " + v + " : " + count + "" }, Encoding.UTF8);
+            Console.WriteLine((v + " " + ".".PadRight(count / 150, '.')).PadRight(93, '.') + (" " + count).ToString().PadLeft(6), '.');
+            File.AppendAllLines(Global.TeamsPs, new List<string>() { "# Anzahl " + (v + " : ").PadRight(80,'.') + (" " + count.ToString()).PadLeft(6,'.') + "" }, Encoding.UTF8);
         }
     }
 }

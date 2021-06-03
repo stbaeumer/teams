@@ -32,11 +32,18 @@ FROM Class LEFT JOIN Teacher ON Class.TEACHER_ID = Teacher.TEACHER_ID WHERE (((C
                     {
                         List<Lehrer> klassenleitungen = new List<Lehrer>();
 
-                        foreach (var item in (Global.SafeGetString(oleDbDataReader, 2)).Split(','))
+                        foreach (var klassenleitungIdUntis in (Global.SafeGetString(oleDbDataReader, 2)).Split(','))
                         {
-                            klassenleitungen.Add((from l in lehrers
-                                                  where l.IdUntis.ToString() == item
-                                                  select l).FirstOrDefault());
+                            var klassenleitung = (from l in lehrers
+                                                  where l.IdUntis.ToString() == klassenleitungIdUntis
+                                                  where l.Mail != null
+                                                  where l.Mail != "" // Wer keine Mail hat, kann nicht Klassenleitung sein.
+                                                  select l).FirstOrDefault();
+
+                            if (klassenleitung != null)
+                            {
+                                klassenleitungen.Add(klassenleitung);
+                            }                            
                         }
 
                         Klasse klasse = new Klasse()

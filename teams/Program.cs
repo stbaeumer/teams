@@ -11,6 +11,8 @@ namespace teams
 {
     class Program
     {
+        public static int SuL { get; private set; }
+
         static void Main(string[] args)
         {
             try
@@ -28,24 +30,48 @@ namespace teams
                 Raums raums = new Raums(periode);
                 Unterrichtsgruppes unterrichtsgruppes = new Unterrichtsgruppes();
                 Unterrichts unterrichts = new Unterrichts(periode, klasses, lehrers, fachs, raums, unterrichtsgruppes);
-
                 Teams teamsIst = new Teams(Global.GruppenMemberPs, klasses);
                 
                 Teams klassenteamsSoll = new Teams(klasses, lehrers, schuelers, unterrichts);
-                
-                teamsIst.SyncTeam(false, true, lehrers, new Team(klassenteamsSoll, "Kurs-20-Abiturienten"));
-                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, "Gym13LuL"));
-                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, "BCAbschlussklassenLuL"));
-                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, "BlaueBriefe"));
-                teamsIst.SyncTeam(false, true, lehrers, new Team(lehrers)); // Kollegium
 
-                teamsIst.SyncTeams(true, false, lehrers, new Teams(klasses, lehrers)); // Klassenleitung
-                teamsIst.SyncTeams(true, false, lehrers, new Teams(lehrers, "Lehrerinnen"));
-                teamsIst.SyncTeams(true, false, lehrers, new Teams(lehrers, "Vollzeitkraefte"));
-                teamsIst.SyncTeams(true, false, lehrers, new Teams(lehrers, "Teilzeitkraefte"));
-                teamsIst.SyncTeams(true, false, lehrers, new Teams(klassenteamsSoll));
-                
+                var xx = (from s in klassenteamsSoll where s.DisplayName.StartsWith("AGG18A") select s).ToList();
+
+                klassenteamsSoll = new Teams();
+                klassenteamsSoll.AddRange(xx);
+
+                teamsIst.SyncTeams(true, false, lehrers, new Teams(klassenteamsSoll, "Klassenteams-LuL"));
+                teamsIst.SyncTeams(false, true, lehrers, new Teams(klassenteamsSoll, "Klassenteams-SuS"));                
+                teamsIst.SyncTeams(true, false, lehrers, new Teams(klassenteamsSoll, "Bildungsgaenge"));
+
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Gym13-Klassenleitungen"));
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Gym13-SuS"));
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Gym13-LuL"));
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "AbschlussklassenBC-LuL"));
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "AbschlussklassenBC-SuS"));
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "AbschlussklassenBC-Klassenleitungen"));
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "BlaueBriefe-LuL"));
+
+                // Zeugniskonferenzen
+
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Halbjahreszeugniskonferenzen BS HBG FS")); // namensgleich mit dem Outlook-Termin
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Halbjahreszeugniskonferenzen BW HBW")); // namensgleich mit dem Outlook-Termin
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Halbjahreszeugniskonferenzen BT HBT FM")); // namensgleich mit dem Outlook-Termin
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Halbjahreszeugniskonferenzen GE GT GW")); // namensgleich mit dem Outlook-Termin
+
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Jahreszeugniskonferenzen BS HBG FS")); // namensgleich mit dem Outlook-Termin
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Jahreszeugniskonferenzen BW HBW")); // namensgleich mit dem Outlook-Termin
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Jahreszeugniskonferenzen BT HBT")); // namensgleich mit dem Outlook-Termin
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Jahreszeugniskonferenzen GE GT GW")); // namensgleich mit dem Outlook-Termin
+
+                teamsIst.SyncTeam(false, true, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Kollegium"));
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Lehrerinnen"));
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Vollzeitkraefte"));
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Teilzeitkraefte"));
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Klassenleitungen"));
+
                 // Teams aus den Untis-Anrechnungen
+
+                File.AppendAllText(Global.TeamsPs, Global.Anrechnungen(), Encoding.UTF8);
 
                 foreach (var untisAnrechnung in GetUntisAnrechnungen(lehrers))
                 {
@@ -62,7 +88,6 @@ namespace teams
                 File.AppendAllLines(Global.TeamsPs, Global.TeamsPs1, Encoding.UTF8);
                 Console.ReadKey();
                 Environment.Exit(0);
-
             }
             catch (Exception ex)
             {
@@ -77,10 +102,15 @@ namespace teams
 
         private static List<string> GetUntisAnrechnungen(Lehrers lehrers)
         {
-            var untisanrechnungen =new List<string>();
-            untisanrechnungen.AddRange((from l in lehrers from a in l.Anrechnungen select a.Beschr).ToList().Distinct());
+            var untisanrechnungen = new List<string>();
 
-            foreach (var an in (from l in lehrers from a in l.Anrechnungen select a.TextGekürzt).Distinct().ToList())
+            // Wenn 2 oder mehr eine Anrechnung mit derselben Beschreibung bekommen, wird das zur Verteilergruppe
+
+            untisanrechnungen.AddRange((from l in lehrers from a in l.Anrechnungen where a.Beschr != "" where a.Beschr.Count() > 1 select a.Beschr).ToList().Distinct());
+
+            // Wenn 2 oder mehr eine Anrechnung mit demselben Text bekommen, wird das zur Verteilergruppe. Was in runden Klammern steht, wird ignoriert. 
+
+            foreach (var an in (from l in lehrers from a in l.Anrechnungen where a.TextGekürzt != "" where a.TextGekürzt.Count() > 1 select a.TextGekürzt).Distinct().ToList())
             {
                 if (!untisanrechnungen.Contains(an))
                 {
