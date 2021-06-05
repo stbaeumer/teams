@@ -34,13 +34,8 @@ namespace teams
                 
                 Teams klassenteamsSoll = new Teams(klasses, lehrers, schuelers, unterrichts);
 
-                var xx = (from s in klassenteamsSoll where s.DisplayName.StartsWith("AGG18A") select s).ToList();
-
-                klassenteamsSoll = new Teams();
-                klassenteamsSoll.AddRange(xx);
-
                 teamsIst.SyncTeams(true, false, lehrers, new Teams(klassenteamsSoll, "Klassenteams-LuL"));
-                teamsIst.SyncTeams(false, true, lehrers, new Teams(klassenteamsSoll, "Klassenteams-SuS"));                
+                // teamsIst.SyncTeams(false, true, lehrers, new Teams(klassenteamsSoll, "Klassenteams-SuS"));                
                 teamsIst.SyncTeams(true, false, lehrers, new Teams(klassenteamsSoll, "Bildungsgaenge"));
 
                 teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Gym13-Klassenleitungen"));
@@ -49,7 +44,7 @@ namespace teams
                 teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "AbschlussklassenBC-LuL"));
                 teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "AbschlussklassenBC-SuS"));
                 teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "AbschlussklassenBC-Klassenleitungen"));
-                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "BlaueBriefe-LuL"));
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Blaue Briefe eintragen")); // namensgleich mit dem Outlook-Termin
 
                 // Zeugniskonferenzen
 
@@ -86,6 +81,7 @@ namespace teams
 
                 Global.TeamsPs1.Add("    Write-Host 'Ende der Verarbeitung'");
                 File.AppendAllLines(Global.TeamsPs, Global.TeamsPs1, Encoding.UTF8);
+                Console.WriteLine("Ende der Verarbeitung");
                 Console.ReadKey();
                 Environment.Exit(0);
             }

@@ -111,7 +111,10 @@ namespace teams
                     klassenteamSoll.Members.Add(schuelerDerKlasse);
                 }
 
-                this.Add(klassenteamSoll);
+                if (klassenteamSoll.Members.Count() + klassenteamSoll.Owners.Count() > 0)
+                {
+                    this.Add(klassenteamSoll);
+                }                
             }
 
             Global.WriteLine("Klassenteams Soll", this.Count);
@@ -142,7 +145,17 @@ namespace teams
         {
             if (!(from teamIst in this where teamIst.DisplayName == teamSoll.DisplayName where teamIst.Typ == typ select teamIst).Any())
             {
+                teamSoll.Typ = typ;
                 teamSoll.TeamAnlegen(typ);
+
+                // Ein neu angelegtes Team wird den Ist-Teams zugerechnet, damit anchließend direkt Member hinzugefügt werden können.
+                Team t = new Team();
+                t.DisplayName = teamSoll.DisplayName;
+                t.Typ = typ;
+                t.Members = new List<string>();
+                t.Owners = new List<string>();
+
+                this.Add(t);
             }
 
             foreach (var teamIst in (from i in this where i.DisplayName == teamSoll.DisplayName where i.Typ == typ select i).ToList())
