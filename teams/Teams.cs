@@ -88,8 +88,10 @@ namespace teams
             {
                 Team klassenteamSoll = new Team(klasse.NameUntis, "Klasse");
 
+                klassenteamSoll.Unterrichts.AddRange((from u in unterrichts where u.KlasseKürzel == klasse.NameUntis select u).ToList());
+
                 var unterrichtendeLehrer = (from l in lehrers
-                                            where ((from u in unterrichts where u.KlasseKürzel == klasse.NameUntis select u.LehrerKürzel).ToList()).Contains(l.Kürzel)
+                                            where (from u in unterrichts where u.KlasseKürzel == klasse.NameUntis select u.LehrerKürzel).ToList().Contains(l.Kürzel)
                                             where l.Mail != null
                                             where l.Mail != ""
                                             select l.Mail).ToList();
@@ -118,6 +120,7 @@ namespace teams
             }
 
             Global.WriteLine("Klassenteams Soll", this.Count);
+            Console.WriteLine("");
         }
 
         internal void SyncTeams(bool verteilergruppe, bool teams, Lehrers lehrers, Teams teamsSoll)

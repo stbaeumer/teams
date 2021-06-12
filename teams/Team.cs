@@ -10,6 +10,7 @@ namespace teams
         public string TeamId { get; set; }
         public List<string> Owners { get; set; }
         public List<string> Members { get; set; }
+        public Unterrichts Unterrichts { get; private set; }
         public string Kategorie { get; set; }        
         /// <summary>
         /// Der Typ ist entweder 0365 oder Distribution
@@ -26,6 +27,7 @@ namespace teams
             Kategorie = kategorie;
             Owners = new List<string>() { };
             Members = new List<string>() { };
+            Unterrichts = new Unterrichts();
 
             if (Kategorie != "Klasse")
             {
@@ -391,6 +393,146 @@ namespace teams
                     }
                 }
             }
+            if (name == "Klassenleitungen")
+            {
+                foreach (var klasse in klasses)
+                {   
+                    foreach (var klassenleitung in klasse.Klassenleitungen)
+                    {
+                        if (!this.Members.Contains(klassenleitung.Mail))
+                        {
+                            this.Members.Add(klassenleitung.Mail);
+                        }
+                    }                    
+                }
+            }
+            if (name == "Fachschaft-Sport")
+            {
+                foreach (var klassenTeam in klassenteams)
+                {
+                    foreach (var unterricht in klassenTeam.Unterrichts)
+                    {
+                        if (new List<string>() { "SP", "SP G1", "SP G2" }.Contains(unterricht.FachKürzel))
+                        {
+                            var lehrerMail = (from l in lehrers where l.Kürzel == unterricht.LehrerKürzel select l.Mail).FirstOrDefault();
+
+                            if (lehrerMail != null)
+                            {
+                                if (!this.Members.Contains(lehrerMail))
+                                {
+                                    this.Members.Add(lehrerMail);
+                                }
+                            }                            
+                        }
+                    }
+                }
+            }
+            if (name == "Fachschaft-Mathe")
+            {
+                foreach (var klassenTeam in klassenteams)
+                {
+                    foreach (var unterricht in klassenTeam.Unterrichts)
+                    {
+                        if (new List<string>() { "M", "M FU", "M1", "M2", "M G1", "M G2", "M L1", "M L2", "M L", "ML", "ML1", "ML2" }.Contains(unterricht.FachKürzel))
+                        {
+                            var lehrerMail = (from l in lehrers where l.Kürzel == unterricht.LehrerKürzel select l.Mail).FirstOrDefault();
+
+                            if (lehrerMail != null)
+                            {
+                                if (!this.Members.Contains(lehrerMail))
+                                {
+                                    this.Members.Add(lehrerMail);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (name == "Fachschaft-Deutsch")
+            {
+                foreach (var klassenTeam in klassenteams)
+                {
+                    foreach (var unterricht in klassenTeam.Unterrichts)
+                    {
+                        if (new List<string>() { "D", "D FU", "D1", "D2", "D G1", "D G2", "D L1", "D L2", "D L", "DL", "DL1", "DL2" }.Contains(unterricht.FachKürzel))
+                        {
+                            var lehrerMail = (from l in lehrers where l.Kürzel == unterricht.LehrerKürzel select l.Mail).FirstOrDefault();
+
+                            if (lehrerMail != null)
+                            {
+                                if (!this.Members.Contains(lehrerMail))
+                                {
+                                    this.Members.Add(lehrerMail);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (name == "Fachschaft-Englisch")
+            {
+                foreach (var klassenTeam in klassenteams)
+                {
+                    foreach (var unterricht in klassenTeam.Unterrichts)
+                    {
+                        if (new List<string>() { "E", "E FU", "E1", "E2", "E G1", "E G2", "E L1", "E L2", "E L", "EL", "EL1", "EL2" }.Contains(unterricht.FachKürzel))
+                        {
+                            var lehrerMail = (from l in lehrers where l.Kürzel == unterricht.LehrerKürzel select l.Mail).FirstOrDefault();
+
+                            if (lehrerMail != null)
+                            {
+                                if (!this.Members.Contains(lehrerMail))
+                                {
+                                    this.Members.Add(lehrerMail);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (name == "Fachschaft-Religion")
+            {
+                foreach (var klassenTeam in klassenteams)
+                {
+                    foreach (var unterricht in klassenTeam.Unterrichts)
+                    {
+                        if (new List<string>() { "KR", "KR FU", "KR1", "KR2", "KR G1", "KR G2", "ER", "ER G1" }.Contains(unterricht.FachKürzel))
+                        {
+                            var lehrerMail = (from l in lehrers where l.Kürzel == unterricht.LehrerKürzel select l.Mail).FirstOrDefault();
+
+                            if (lehrerMail != null)
+                            {
+                                if (!this.Members.Contains(lehrerMail))
+                                {
+                                    this.Members.Add(lehrerMail);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (name == "Fachschaft-Politik-GG")
+            {
+                foreach (var klassenTeam in klassenteams)
+                {
+                    foreach (var unterricht in klassenTeam.Unterrichts)
+                    {
+                        if (new List<string>() { "PK", "PK FU", "PK1", "PK2", "GG G1", "GG G2" }.Contains(unterricht.FachKürzel))
+                        {
+                            var lehrerMail = (from l in lehrers where l.Kürzel == unterricht.LehrerKürzel select l.Mail).FirstOrDefault();
+
+                            if (lehrerMail != null)
+                            {
+                                if (!this.Members.Contains(lehrerMail))
+                                {
+                                    this.Members.Add(lehrerMail);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         internal void TeamAnlegen(string typ)
@@ -399,9 +541,9 @@ namespace teams
             {
                 if (this.Typ == typ)
                 {
-                    Console.WriteLine("[+] Neue Verteilergruppe " + DisplayName);
+                    Console.WriteLine("[+] Neue Verteilergruppe : " + DisplayName);
                     Global.TeamsPs1.Add(@"    Write-Host '[+] Neue Verteilergruppe: " + DisplayName.PadRight(30) + "'");
-                    Global.TeamsPs1.Add(@"    New-DistributionGroup -Name " + DisplayName + " -PrimarySmtpAddress " + DisplayName + "@berufskolleg-borken.de -Confirm:$confirm"); // -Confirm:$false
+                    Global.TeamsPs1.Add(@"    New-DistributionGroup -Name " + DisplayName + " -PrimarySmtpAddress " + ToSmtp(DisplayName) + "@berufskolleg-borken.de -Confirm:$confirm"); // -Confirm:$false
                 }
                 else
                 {
@@ -415,14 +557,30 @@ namespace teams
             }
         }
 
+        private string ToSmtp(string displayName)
+        {
+            return displayName.Replace("--", "-")
+                                        .Replace("---", "-")
+                                        .Replace("ä", "ae")
+                                        .Replace("ö", "oe")
+                                        .Replace("ü", "ue")
+                                        .Replace("ß", "ss")
+                                        .Replace("Ä", "Ae")
+                                        .Replace("Ö", "Oe")
+                                        .Replace("Ü", "Ue")
+                                        .Replace(" ", "-")
+                                        .Replace("/", "-")
+                                        .Replace("---", "-");
+        }
+
         internal void OwnerUndMemberAnlegen(Team teamIst)
         {
             foreach (var sollMember in this.Members)
             {
                 if (!teamIst.Members.Contains(sollMember))
                 {
-                    Console.WriteLine("[+] Neuer " + teamIst.Typ.Substring(0,4) + "-Member : " + sollMember.PadRight(30) + " -> " + teamIst.DisplayName);
-                    Global.TeamsPs1.Add(@"    Write-Host '[+] Neuer " + teamIst.Typ.Substring(0, 4) + "-Member : " + sollMember.PadRight(30) + " -> " + teamIst.DisplayName + "'");
+                    Console.WriteLine("    + Neuer " + teamIst.Typ.Substring(0,4) + "-Member  : " + sollMember.PadRight(44) + " -> " + teamIst.DisplayName);
+                    Global.TeamsPs1.Add(@"    Write-Host '[+] Neuer " + teamIst.Typ.Substring(0, 4) + "-Member : " + sollMember.PadRight(44) + " -> " + teamIst.DisplayName + "'");
 
                     if (teamIst.Typ == "O365")
                     {
@@ -431,15 +589,15 @@ namespace teams
                     if (teamIst.Typ == "Distribution")
                     {
                         Global.TeamsPs1.Add(@"    Add-DistributionGroupMember -Identity " + teamIst.DisplayName + " -Member '" + sollMember + "' -Confirm:$confirm");
-                    }                    
+                    }
                 }
             }
             foreach (var sollOwner in this.Owners)
             {
                 if (!teamIst.Owners.Contains(sollOwner))
                 {
-                    Console.WriteLine("[+] Neuer " + teamIst.Typ.Substring(0, 4) + "-Owner : " + sollOwner.PadRight(30) + " -> " + teamIst.DisplayName);
-                    Global.TeamsPs1.Add(@"    Write-Host '[+] Neuer " + teamIst.Typ.Substring(0, 4) + "-Owner : " + sollOwner.PadRight(30) + " -> " + teamIst.DisplayName + "'");
+                    Console.WriteLine("    + Neuer " + teamIst.Typ.Substring(0, 4) + "-Owner  :  " + sollOwner.PadRight(44) + " -> " + teamIst.DisplayName);
+                    Global.TeamsPs1.Add(@"    Write-Host '[+] Neuer " + teamIst.Typ.Substring(0, 4) + "-Owner : " + sollOwner.PadRight(44) + " -> " + teamIst.DisplayName + "'");
                     if (teamIst.Typ == "O365")
                     {
                         Global.TeamsPs1.Add(@"    Add-UnifiedGroupLinks -Identity " + teamIst.TeamId + " -LinkType Owner -Links '" + sollOwner + "' -Confirm:$confirm");
@@ -467,7 +625,7 @@ namespace teams
 
                     if (istMember.Contains("students") || (lehrers.istLehrer(istMember) && (DateTime.Now.Month == 9 || DateTime.Now.Month == 8 || (DateTime.Now.Month == 2 && DateTime.Now.Day > 8))))
                     {
-                        Console.WriteLine("[-] Owner  entfernen:" + istMember.PadRight(30) + " aus " + this.DisplayName);
+                        Console.WriteLine("    - Owner entfernen :" + istMember.PadRight(30) + " aus " + this.DisplayName);
                         Global.TeamsPs1.Add(@"    Write-Host '[-] Owner  entfernen: " + this.DisplayName.PadRight(30) + " aus " + this.DisplayName + "'");
                         Global.TeamsPs1.Add(@"    Remove-UnifiedGroupLinks -Identity " + this.TeamId + " -LinkType Owner -Links '" + istMember + "' -Confirm:$confirm"); // -Confirm:$false
                     }
@@ -483,7 +641,7 @@ namespace teams
 
                         if ((from l in lehrers where l.Mail == istOwner select l).Any())
                         {
-                            Console.WriteLine("[-] Owner  entfernen:" + istOwner.PadRight(30) + " aus " + this.DisplayName);
+                            Console.WriteLine("      - Owner  entfernen:" + istOwner.PadRight(30) + " aus " + this.DisplayName);
                             Global.TeamsPs1.Add(@"    Write-Host '[-] Owner  entfernen: " + this.DisplayName.PadRight(30) + " aus " + this.DisplayName + "'");
                             Global.TeamsPs1.Add(@"    Remove-UnifiedGroupLinks -Identity " + this.TeamId + " -LinkType Owner -Links '" + istOwner + "' -Confirm:$confirm"); // -Confirm:$false
                         }

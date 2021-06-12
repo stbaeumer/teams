@@ -63,6 +63,15 @@ namespace teams
                 teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Vollzeitkraefte"));
                 teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Teilzeitkraefte"));
                 teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Klassenleitungen"));
+                
+                // Fachschaften
+                
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Fachschaft-Sport"));
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Fachschaft-Mathe"));
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Fachschaft-Deutsch"));
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Fachschaft-Englisch"));
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Fachschaft-Religion"));
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Fachschaft-Politik-GG"));
 
                 // Teams aus den Untis-Anrechnungen
 
