@@ -123,6 +123,10 @@ WHERE (((SCHOOLYEAR_ID)= " + Global.AktSj[0] + Global.AktSj[1] + ") AND ((TERM_I
                             var les = lesson[i].Split('~');
                             string lehrer = les[0] == "" ? null : (from l in lehrers where l.IdUntis.ToString() == les[0] select l.Kürzel).FirstOrDefault();
 
+                            if (lehrer == "KU")
+                            {
+                                string a = "";
+                            }
                             string fach = les[2] == "0" ? "" : (from f in fachs where f.IdUntis.ToString() == les[2] select f.KürzelUntis).FirstOrDefault();
 
                             string raumDiesesUnterrichts = "";

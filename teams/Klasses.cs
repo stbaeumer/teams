@@ -46,11 +46,14 @@ FROM Class LEFT JOIN Teacher ON Class.TEACHER_ID = Teacher.TEACHER_ID WHERE (((C
                             }                            
                         }
 
+                        bool istVollzeit = istVollzeitKlasse(Global.SafeGetString(oleDbDataReader, 1));
+
                         Klasse klasse = new Klasse()
                         {
                             IdUntis = oleDbDataReader.GetInt32(0),
                             NameUntis = Global.SafeGetString(oleDbDataReader, 1),
-                            Klassenleitungen = klassenleitungen
+                            Klassenleitungen = klassenleitungen,
+                            IstVollzeit = istVollzeit
                         };
 
                         this.Add(klasse);
@@ -71,6 +74,20 @@ FROM Class LEFT JOIN Teacher ON Class.TEACHER_ID = Teacher.TEACHER_ID WHERE (((C
                     oleDbConnection.Close();
                 }
             }
+        }
+
+        private bool istVollzeitKlasse(string klassenname)
+        {
+            var vollzeitBeginn = new List<string>() { "BS", "BW", "BT", "FM", "FS", "G", "HB" };
+            
+            foreach (var item in vollzeitBeginn)
+            {
+                if (klassenname.StartsWith(item))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

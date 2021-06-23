@@ -40,26 +40,20 @@ namespace teams
         {
             Members = new List<string>();
             Owners = new List<string>();
-            DisplayName = name;
+            DisplayName = name.Replace("--", "-")
+                                        .Replace("---", "-")
+                                        .Replace("ä", "ae")
+                                        .Replace("ö", "oe")
+                                        .Replace("ü", "ue")
+                                        .Replace("ß", "ss")
+                                        .Replace("Ä", "Ae")
+                                        .Replace("Ö", "Oe")
+                                        .Replace("Ü", "Ue")
+                                        .Replace(" ", "-")
+                                        .Replace("/", "-")
+                                        .Replace("---", "-"); ;
 
             int sj = Convert.ToInt32(Global.AktSj[0].Substring(2, 2));
-
-            if (name == "Gym13-Klassenleitungen")
-            {
-                foreach (var klasse in klasses)
-                {
-                    if (klasse.NameUntis.StartsWith("G") && klasse.NameUntis.Contains((sj - 2).ToString()))
-                    {
-                        foreach (var klassenleitung in klasse.Klassenleitungen)
-                        {
-                            if (!this.Members.Contains(klassenleitung.Mail))
-                            {
-                                this.Members.Add(klassenleitung.Mail);
-                            }
-                        }
-                    }
-                }
-            }
 
             if (name == "Gym13-SuS")
             {
@@ -138,29 +132,7 @@ namespace teams
                     }
                 }
             }
-
-            if (name == "AbschlussklassenBC-Klassenleitungen")
-            {
-                foreach (var klasse in klasses)
-                {
-                    if (
-                            klasse.NameUntis.StartsWith("BS") && klasse.NameUntis.Contains((sj - 1).ToString()) ||
-                            klasse.NameUntis.StartsWith("HB") && klasse.NameUntis.Contains((sj - 1).ToString()) ||
-                            klasse.NameUntis.StartsWith("FM") && klasse.NameUntis.Contains((sj).ToString()) ||
-                            klasse.NameUntis.StartsWith("FS") && klasse.NameUntis.Contains((sj - 1).ToString())
-                        )
-                    {
-                        foreach (var klassenleitung in klasse.Klassenleitungen)
-                        {
-                            if (!this.Members.Contains(klassenleitung.Mail))
-                            {
-                                this.Members.Add(klassenleitung.Mail);
-                            }
-                        }
-                    }
-                }
-            }
-
+                        
             if (name == "BlaueBriefe-LuL")
             {
                 foreach (var klassenTeam in klassenteams)
@@ -215,7 +187,7 @@ namespace teams
                         )
                     {
                         foreach (var member in klassenTeam.Members)
-                        {
+                        {                           
                             if (!this.Members.Contains(member) && !member.Contains("student"))
                             {
                                 this.Members.Add(member);
@@ -288,6 +260,45 @@ namespace teams
                 }
             }
 
+            if (name == "Jahreszeugniskonferenzen BS HBG") // namensgleich mit Outlook-Termin
+            {
+                foreach (var klassenTeam in klassenteams)
+                {
+                    if (
+                            (klassenTeam.DisplayName.StartsWith("BS") && klassenTeam.DisplayName.Contains((sj).ToString())) ||                            
+                            (klassenTeam.DisplayName.StartsWith("HBG") && klassenTeam.DisplayName.Contains((sj).ToString()))
+                        )
+                    {
+                        foreach (var member in klassenTeam.Members)
+                        {
+                            if (!this.Members.Contains(member) && !member.Contains("student"))
+                            {
+                                this.Members.Add(member);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (name == "Jahreszeugniskonferenzen FS") // namensgleich mit Outlook-Termin
+            {
+                foreach (var klassenTeam in klassenteams)
+                {
+                    if (                            
+                            (klassenTeam.DisplayName.StartsWith("FS") && klassenTeam.DisplayName.Contains((sj).ToString()))
+                        )
+                    {
+                        foreach (var member in klassenTeam.Members)
+                        {
+                            if (!this.Members.Contains(member) && !member.Contains("student"))
+                            {
+                                this.Members.Add(member);
+                            }
+                        }
+                    }
+                }
+            }
+
             if (name == "Jahreszeugniskonferenzen BW HBW") // namensgleich mit Outlook-Termin
             {
                 foreach (var klassenTeam in klassenteams)
@@ -347,6 +358,117 @@ namespace teams
                 }
             }
 
+            // Klassenleitungen
+
+            if (name == "Klassenleitungen")
+            {
+                foreach (var klasse in klasses)
+                {
+                    foreach (var klassenleitung in klasse.Klassenleitungen)
+                    {
+                        if (!this.Members.Contains(klassenleitung.Mail))
+                        {
+                            this.Members.Add(klassenleitung.Mail);
+                        }
+                    }
+                }
+            }
+
+            if (name == "Klassenpflegschaft-Teilzeit")
+            {
+                foreach (var klasse in klasses)
+                {
+                    if (!klasse.IstVollzeit)
+                    {
+                        foreach (var klassenleitung in klasse.Klassenleitungen)
+                        {
+                            if (!this.Members.Contains(klassenleitung.Mail))
+                            {
+                                this.Members.Add(klassenleitung.Mail);
+                            }
+                        }
+                    }                    
+                }
+            }
+
+            if (name == "Klassenpflegschaft-Vollzeit")
+            {
+                foreach (var klasse in klasses)
+                {
+                    if (klasse.IstVollzeit)
+                    {
+                        foreach (var klassenleitung in klasse.Klassenleitungen)
+                        {
+                            if (!this.Members.Contains(klassenleitung.Mail))
+                            {
+                                this.Members.Add(klassenleitung.Mail);
+                            }
+                        }
+                    }                    
+                }
+            }
+
+            if (name == "Klassenleitungen-Gym13")
+            {
+                foreach (var klasse in klasses)
+                {
+                    if (klasse.NameUntis.StartsWith("G") && klasse.NameUntis.Contains((sj - 2).ToString()))
+                    {
+                        foreach (var klassenleitung in klasse.Klassenleitungen)
+                        {
+                            if (!this.Members.Contains(klassenleitung.Mail))
+                            {
+                                this.Members.Add(klassenleitung.Mail);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (name == "Klassenleitungen-AbschlussklassenBC")
+            {
+                foreach (var klasse in klasses)
+                {
+                    if (
+                            klasse.NameUntis.StartsWith("BS") && klasse.NameUntis.Contains((sj - 1).ToString()) ||
+                            klasse.NameUntis.StartsWith("HB") && klasse.NameUntis.Contains((sj - 1).ToString()) ||
+                            klasse.NameUntis.StartsWith("FM") && klasse.NameUntis.Contains((sj).ToString()) ||
+                            klasse.NameUntis.StartsWith("FS") && klasse.NameUntis.Contains((sj - 1).ToString())
+                        )
+                    {
+                        foreach (var klassenleitung in klasse.Klassenleitungen)
+                        {
+                            if (!this.Members.Contains(klassenleitung.Mail))
+                            {
+                                this.Members.Add(klassenleitung.Mail);
+                            }
+                        }
+                    }
+                }
+            }
+            if (name == "Klassenleitungen-Versetzungsklassen")
+            {
+                foreach (var klasse in klasses)
+                {
+                    if (
+                            klasse.NameUntis.StartsWith("BS") && klasse.NameUntis.Contains((sj).ToString()) ||
+                            klasse.NameUntis.StartsWith("HB") && klasse.NameUntis.Contains((sj).ToString()) ||
+                            klasse.NameUntis.StartsWith("G") && klasse.NameUntis.Contains((sj).ToString()) ||
+                            klasse.NameUntis.StartsWith("FS") && klasse.NameUntis.Contains((sj).ToString())
+                        )
+                    {
+                        foreach (var klassenleitung in klasse.Klassenleitungen)
+                        {
+                            if (!this.Members.Contains(klassenleitung.Mail))
+                            {
+                                this.Members.Add(klassenleitung.Mail);
+                            }
+                        }
+                    }
+                }
+            }
+
+
             if (name == "Kollegium")
             {
                 foreach (var lehrer in lehrers)
@@ -393,19 +515,7 @@ namespace teams
                     }
                 }
             }
-            if (name == "Klassenleitungen")
-            {
-                foreach (var klasse in klasses)
-                {   
-                    foreach (var klassenleitung in klasse.Klassenleitungen)
-                    {
-                        if (!this.Members.Contains(klassenleitung.Mail))
-                        {
-                            this.Members.Add(klassenleitung.Mail);
-                        }
-                    }                    
-                }
-            }
+            
             if (name == "Fachschaft-Sport")
             {
                 foreach (var klassenTeam in klassenteams)
@@ -541,9 +651,9 @@ namespace teams
             {
                 if (this.Typ == typ)
                 {
-                    Console.WriteLine("[+] Neue Verteilergruppe : " + DisplayName);
-                    Global.TeamsPs1.Add(@"    Write-Host '[+] Neue Verteilergruppe: " + DisplayName.PadRight(30) + "'");
-                    Global.TeamsPs1.Add(@"    New-DistributionGroup -Name " + DisplayName + " -PrimarySmtpAddress " + ToSmtp(DisplayName) + "@berufskolleg-borken.de -Confirm:$confirm"); // -Confirm:$false
+                    Console.WriteLine("[+] Neue Verteilergruppe : " + DisplayName);                    
+                    Global.TeamsPs1.Add(@"    $bool = switch (Read-Host '[+] Neue Verteilergruppe: *" + DisplayName + "* - Soll sie von extern erreichbar sein? (j/n)') { 'j' { $true } default { $false }}");
+                    Global.TeamsPs1.Add(@"      New-DistributionGroup -Name " + DisplayName + " -PrimarySmtpAddress " + ToSmtp(DisplayName) + "@berufskolleg-borken.de -RequireSenderAuthenticationEnabled $bool; $bool = $false; Set-Group -Identity " + DisplayName + " -Notes 'automatisch aktualisiert | BM | " + DateTime.Now.ToShortDateString() + "'");                    
                 }
                 else
                 {
@@ -581,14 +691,14 @@ namespace teams
                 {
                     Console.WriteLine("    + Neuer " + teamIst.Typ.Substring(0,4) + "-Member  : " + sollMember.PadRight(44) + " -> " + teamIst.DisplayName);
                     Global.TeamsPs1.Add(@"    Write-Host '[+] Neuer " + teamIst.Typ.Substring(0, 4) + "-Member : " + sollMember.PadRight(44) + " -> " + teamIst.DisplayName + "'");
-
+                                        
                     if (teamIst.Typ == "O365")
                     {
-                        Global.TeamsPs1.Add(@"    Add-UnifiedGroupLinks -Identity " + teamIst.TeamId + " -LinkType Member -Links '" + sollMember + "' -Confirm:$confirm");
+                        Global.TeamsPs1.Add(@"    Add-UnifiedGroupLinks -Identity " + teamIst.TeamId + " -LinkType Member -Links '" + sollMember + "' -Confirm:$confirm");                        
                     }
                     if (teamIst.Typ == "Distribution")
                     {
-                        Global.TeamsPs1.Add(@"    Add-DistributionGroupMember -Identity " + teamIst.DisplayName + " -Member '" + sollMember + "' -Confirm:$confirm");
+                        Global.TeamsPs1.Add(@"    Add-DistributionGroupMember -Identity " + teamIst.DisplayName + " -Member '" + sollMember + "' -Confirm:$confirm; Set-Group -Identity " + teamIst.DisplayName + " -Notes 'automatisch aktualisiert | BM | " + DateTime.Now.ToShortDateString() + "';");                        
                     }
                 }
             }
@@ -607,7 +717,7 @@ namespace teams
 
                     if (teamIst.Typ == "Distribution" && !teamIst.Members.Contains(sollOwner))
                     {
-                        Global.TeamsPs1.Add(@"    Add-DistributionGroupMember -Identity " + teamIst.DisplayName + " -Member '" + sollOwner + "' -Confirm:$confirm");
+                        Global.TeamsPs1.Add(@"    Add-DistributionGroupMember -Identity " + teamIst.DisplayName + " -Member '" + sollOwner + "' -Confirm:$confirm; Set-Group -Identity " + teamIst.DisplayName + " -Notes 'automatisch aktualisiert | BM | " + DateTime.Now.ToShortDateString() + "'");                        
                     }
                 }
             }
@@ -658,6 +768,7 @@ namespace teams
         {
             this.Members = new List<string>();
             this.Owners = new List<string>();
+
             this.DisplayName = untisAnrechnung.Replace("--", "-")
                                         .Replace("---", "-")
                                         .Replace("ä", "ae")
@@ -672,10 +783,10 @@ namespace teams
                                         .Replace("---", "-");
 
             foreach (var lehrer in lehrers)
-            {
+            {                
                 foreach (var anrechnung in lehrer.Anrechnungen)
                 {
-                    if (anrechnung.Beschr == untisAnrechnung)
+                    if (anrechnung.Beschr == untisAnrechnung || anrechnung.TextGekürzt == untisAnrechnung)
                     {
                         if (!this.Members.Contains(lehrer.Mail))
                         {

@@ -42,19 +42,26 @@ WHERE (((SCHOOLYEAR_ID)= " + Global.AktSj[0] + Global.AktSj[1] + ") AND  ((TERM_
                         {
                             IdUntis = oleDbDataReader.GetInt32(0),
                             Kürzel = Global.SafeGetString(oleDbDataReader, 1),
+                            Nachname = Global.SafeGetString(oleDbDataReader, 2),
+                            Vorname = Global.SafeGetString(oleDbDataReader, 3),
                             Mail = Global.SafeGetString(oleDbDataReader, 4),
                             Deputat = Convert.ToDouble(oleDbDataReader.GetInt32(5)) / 1000,
                             Geschlecht = Global.SafeGetString(oleDbDataReader, 6).Contains("W") ? "w" : "m",                            
                             Anrechnungen = (from a in anrechnungen where a.TeacherIdUntis == oleDbDataReader.GetInt32(0) select a).ToList()
                         };
 
-                        if (lehrer.Mail.Contains("ertrud"))
-                        {
-                            lehrer.Mail = lehrer.Mail.Replace("ertrud", "erti");
-                        }
+                        lehrer.Mail = lehrer.Mail.Contains("ertrud") ? lehrer.Mail.Replace("ertrud", "erti") : lehrer.Mail;
 
-                        if (lehrer.Mail != "")                            
+                        if (lehrer.Mail != "")
                         {
+                            if (!lehrer.Mail.ToUpper().StartsWith(lehrer.Vorname.Substring(0, 1)) || !lehrer.Mail.ToUpper().Contains("." + lehrer.Nachname.ToUpper().Substring(0, 1)))
+                            {
+                                throw new Exception("Die Mail des Lehrers " + lehrer.Kürzel + " lautet " + lehrer.Mail + ". Das kann nicht richtig sein.");
+                            }
+                            this.Add(lehrer);
+                        }
+                        if (lehrer.Mail != "")                            
+                        {                            
                             this.Add(lehrer);
                         }                        
                     };

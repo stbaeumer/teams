@@ -71,6 +71,10 @@ namespace teams
             }
 
             Global.WriteLine("vorhandene Teams", this.Count);
+            if (this.Count == 0)
+            {
+                throw new Exception("Es ist kein einziges IstTeam vorhanden. Evtl. ist die Datei mit den Gruppenzugehörigkeiten leer.");
+            }
             Global.WriteLine(" davon O365", (from t in this where t.Typ == "O365" select t).Count());
             Global.WriteLine(" davon Verteilergruppen", (from t in this where t.Typ == "Distribution" select t).Count());
         }
@@ -146,26 +150,47 @@ namespace teams
 
         private void Sync(Lehrers lehrers, Team teamSoll, string typ)
         {
-            if (!(from teamIst in this where teamIst.DisplayName == teamSoll.DisplayName where teamIst.Typ == typ select teamIst).Any())
+            // Es werden bestimmte Gruppen ausgeklammert
+
+            var nichtBeachten = new List<string>() { "Erweiterte-Schulleitung", "Steuergruppe", "Vertretungsplanung" };
+
+            if (!nichtBeachten.Contains(teamSoll.DisplayName))
             {
-                teamSoll.Typ = typ;
-                teamSoll.TeamAnlegen(typ);
+                // Nur wenn das Team-Soll mehr als einen Member hat und der Name keinen Punkt enthält, wird es angelegt. Ein Punkt im Namen deutet auf Prosa hin und wird nicht zur Verteilergruppe
 
-                // Ein neu angelegtes Team wird den Ist-Teams zugerechnet, damit anchließend direkt Member hinzugefügt werden können.
-                Team t = new Team();
-                t.DisplayName = teamSoll.DisplayName;
-                t.Typ = typ;
-                t.Members = new List<string>();
-                t.Owners = new List<string>();
+                if (teamSoll.Members.Count > 1 && !teamSoll.DisplayName.Contains(".") && !teamSoll.DisplayName.Contains(":") && !teamSoll.DisplayName.Contains(","))
+                {
+                    if (!(from teamIst in this where teamIst.DisplayName == teamSoll.DisplayName where teamIst.Typ == typ select teamIst).Any())
+                    {
+                        teamSoll.Typ = typ;
+                        teamSoll.TeamAnlegen(typ);
 
-                this.Add(t);
-            }
+                        // Ein neu angelegtes Team wird den Ist-Teams zugerechnet, damit anchließend direkt Member hinzugefügt werden können.
+                        Team t = new Team();
+                        t.DisplayName = teamSoll.DisplayName;
+                        t.Typ = typ;
+                        t.Members = new List<string>();
+                        t.Owners = new List<string>();
 
-            foreach (var teamIst in (from i in this where i.DisplayName == teamSoll.DisplayName where i.Typ == typ select i).ToList())
-            {
-                teamSoll.OwnerUndMemberAnlegen(teamIst);
-                teamIst.OwnerUndMemberLöschen(teamSoll, lehrers);
-            }
+                        this.Add(t);
+                    }
+
+                    foreach (var teamIst in (from i in this where i.DisplayName == teamSoll.DisplayName where i.Typ == typ select i).ToList())
+                    {
+                        teamSoll.OwnerUndMemberAnlegen(teamIst);
+                    }
+                }
+
+                foreach (var teamIst in (from i in this where i.DisplayName == teamSoll.DisplayName where i.Typ == typ select i).ToList())
+                {
+                    // Aus Fachschaften werden LuL nie wieder entfernt.
+
+                    if (!teamSoll.DisplayName.StartsWith("Fachschaft"))
+                    {
+                        teamIst.OwnerUndMemberLöschen(teamSoll, lehrers);
+                    }
+                }
+            }            
         }
 
         /// <summary>

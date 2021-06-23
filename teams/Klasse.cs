@@ -11,5 +11,6 @@ namespace teams
         public int IdUntis { get; internal set; }
         public string NameUntis { get; internal set; }
         public List<Lehrer> Klassenleitungen { get; internal set; }
+        public bool IstVollzeit { get; internal set; }
     }
 }

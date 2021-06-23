@@ -37,13 +37,11 @@ namespace teams
                 teamsIst.SyncTeams(true, false, lehrers, new Teams(klassenteamsSoll, "Klassenteams-LuL"));
                 // teamsIst.SyncTeams(false, true, lehrers, new Teams(klassenteamsSoll, "Klassenteams-SuS"));                
                 teamsIst.SyncTeams(true, false, lehrers, new Teams(klassenteamsSoll, "Bildungsgaenge"));
-
-                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Gym13-Klassenleitungen"));
+                                
                 teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Gym13-SuS"));
                 teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Gym13-LuL"));
                 teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "AbschlussklassenBC-LuL"));
-                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "AbschlussklassenBC-SuS"));
-                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "AbschlussklassenBC-Klassenleitungen"));
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "AbschlussklassenBC-SuS"));                
                 teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Blaue Briefe eintragen")); // namensgleich mit dem Outlook-Termin
 
                 // Zeugniskonferenzen
@@ -54,6 +52,8 @@ namespace teams
                 teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Halbjahreszeugniskonferenzen GE GT GW")); // namensgleich mit dem Outlook-Termin
 
                 teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Jahreszeugniskonferenzen BS HBG FS")); // namensgleich mit dem Outlook-Termin
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Jahreszeugniskonferenzen BS HBG")); // namensgleich mit dem Outlook-Termin
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Jahreszeugniskonferenzen FS")); // namensgleich mit dem Outlook-Termin
                 teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Jahreszeugniskonferenzen BW HBW")); // namensgleich mit dem Outlook-Termin
                 teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Jahreszeugniskonferenzen BT HBT")); // namensgleich mit dem Outlook-Termin
                 teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Jahreszeugniskonferenzen GE GT GW")); // namensgleich mit dem Outlook-Termin
@@ -62,10 +62,18 @@ namespace teams
                 teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Lehrerinnen"));
                 teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Vollzeitkraefte"));
                 teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Teilzeitkraefte"));
+
+                // Klassenleitungen
+
                 teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Klassenleitungen"));
-                
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Klassenpflegschaft-Vollzeit"));
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Klassenpflegschaft-Teilzeit"));
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Klassenleitungen-Gym13"));
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Klassenleitungen-AbschlussklassenBC"));
+                teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Klassenleitungen-Versetzungsklassen"));
+
                 // Fachschaften
-                
+
                 teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Fachschaft-Sport"));
                 teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Fachschaft-Mathe"));
                 teamsIst.SyncTeam(true, false, lehrers, new Team(klassenteamsSoll, klasses, lehrers, "Fachschaft-Deutsch"));
@@ -116,7 +124,7 @@ namespace teams
             // Wenn 2 oder mehr eine Anrechnung mit demselben Text bekommen, wird das zur Verteilergruppe. Was in runden Klammern steht, wird ignoriert. 
 
             foreach (var an in (from l in lehrers from a in l.Anrechnungen where a.TextGekürzt != "" where a.TextGekürzt.Count() > 1 select a.TextGekürzt).Distinct().ToList())
-            {
+            {               
                 if (!untisanrechnungen.Contains(an))
                 {
                     untisanrechnungen.Add(an);
